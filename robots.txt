@@ -1,0 +1,7 @@
+# robots.txt generated at http://tool.chinaz.com/robots/ 
+# 巴啦啦能量，搜索引擎全收录
+Disallow: /editormd
+Disallow: /js
+Disallow: /css
+Disallow: /lib
+Sitemap: https://jimmyqin.cn/sitemap.xml
