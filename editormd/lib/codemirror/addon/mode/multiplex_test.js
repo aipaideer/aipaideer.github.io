@@ -1,3 +1,3 @@
-// build time:Wed Jun 03 2020 16:25:50 GMT+0800 (Central Standard Time)
+// build time:Mon Jun 08 2020 08:20:17 GMT+0800 (Central Standard Time)
 (function(){CodeMirror.defineMode("markdown_with_stex",function(){var e=CodeMirror.getMode({},"stex");var o=CodeMirror.getMode({},"markdown");var r={open:"$",close:"$",mode:e,delimStyle:"delim",innerStyle:"inner"};return CodeMirror.multiplexingMode(o,r)});var e=CodeMirror.getMode({},"markdown_with_stex");function o(o){test.mode(o,e,Array.prototype.slice.call(arguments,1),"multiplexing")}o("stexInsideMarkdown","[strong **Equation:**] [delim&delim-open $][inner&tag \\pi][delim&delim-close $]")})();
 //rebuild by neat 
