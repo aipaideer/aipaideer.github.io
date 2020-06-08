@@ -1,3 +1,3 @@
-// build time:Mon Jun 08 2020 08:20:16 GMT+0800 (Central Standard Time)
+// build time:Mon Jun 08 2020 22:14:25 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){e.defineOption("showTrailingSpace",false,function(i,n,r){if(r==e.Init)r=false;if(r&&!n)i.removeOverlay("trailingspace");else if(!r&&n)i.addOverlay({token:function(e){for(var i=e.string.length,n=i;n&&/\s/.test(e.string.charAt(n-1));--n){}if(n>e.pos){e.pos=n;return null}e.pos=i;return"trailingspace"},name:"trailingspace"})})});
 //rebuild by neat 

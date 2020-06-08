@@ -1,3 +1,3 @@
-// build time:Mon Jun 08 2020 08:20:17 GMT+0800 (Central Standard Time)
+// build time:Mon Jun 08 2020 22:14:26 GMT+0800 (Central Standard Time)
 (function(o){if(typeof exports=="object"&&typeof module=="object")o(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],o);else o(CodeMirror)})(function(o){"use strict";o.registerHelper("lint","json",function(n){var r=[];if(!window.jsonlint){if(window.console){window.console.error("Error: window.jsonlint not defined, CodeMirror JSON linting cannot run.")}return r}var e=window.jsonlint.parser||window.jsonlint;e.parseError=function(n,e){var i=e.loc;r.push({from:o.Pos(i.first_line-1,i.first_column),to:o.Pos(i.last_line-1,i.last_column),message:n})};try{e.parse(n)}catch(i){}return r})});
 //rebuild by neat 

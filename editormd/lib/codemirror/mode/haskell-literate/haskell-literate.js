@@ -1,3 +1,3 @@
-// build time:Mon Jun 08 2020 08:20:20 GMT+0800 (Central Standard Time)
+// build time:Mon Jun 08 2020 22:14:29 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"),require("../haskell/haskell"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","../haskell/haskell"],e);else e(CodeMirror)})(function(e){"use strict";e.defineMode("haskell-literate",function(t,n){var i=e.getMode(t,n&&n.base||"haskell");return{startState:function(){return{inCode:false,baseState:e.startState(i)}},token:function(e,t){if(e.sol()){if(t.inCode=e.eat(">"))return"meta"}if(t.inCode){return i.token(e,t.baseState)}else{e.skipToEnd();return"comment"}},innerMode:function(e){return e.inCode?{state:e.baseState,mode:i}:null}}},"haskell");e.defineMIME("text/x-literate-haskell","haskell-literate")});
 //rebuild by neat 
