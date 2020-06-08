@@ -1,3 +1,3 @@
-// build time:Mon Jun 08 2020 22:14:26 GMT+0800 (Central Standard Time)
+// build time:Mon Jun 08 2020 22:21:54 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.registerHelper("lint","css",function(o,r){var i=[];if(!window.CSSLint){if(window.console){window.console.error("Error: window.CSSLint not defined, CodeMirror CSS linting cannot run.")}return i}var n=CSSLint.verify(o,r),t=n.messages,s=null;for(var f=0;f<t.length;f++){s=t[f];var l=s.line-1,c=s.line-1,d=s.col-1,u=s.col;i.push({from:e.Pos(l,d),to:e.Pos(c,u),message:s.message,severity:s.type})}return i})});
 //rebuild by neat 
