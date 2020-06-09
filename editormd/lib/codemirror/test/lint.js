@@ -1,20 +1,3 @@
-var blint = require("blint");
-
-["mode", "lib", "addon", "keymap"].forEach(function(dir) {
-  blint.checkDir(dir, {
-    browser: true,
-    allowedGlobals: ["CodeMirror", "define", "test", "requirejs"],
-    ecmaVersion: 5,
-    tabs: dir == "lib"
-  });
-});
-
-["src"].forEach(function(dir) {
-  blint.checkDir(dir, {
-    browser: true,
-    ecmaVersion: 6,
-    semicolons: false
-  });
-});
-
-module.exports = {ok: blint.success()};
+// build time:Tue Jun 09 2020 16:43:07 GMT+0800 (Central Standard Time)
+var blint=require("blint");["mode","lib","addon","keymap"].forEach(function(e){blint.checkDir(e,{browser:true,allowedGlobals:["CodeMirror","define","test","requirejs"],ecmaVersion:5,tabs:e=="lib"})});["src"].forEach(function(e){blint.checkDir(e,{browser:true,ecmaVersion:6,semicolons:false})});module.exports={ok:blint.success()};
+//rebuild by neat 
