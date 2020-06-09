@@ -1,3 +1,70 @@
-// build time:Tue Jun 09 2020 16:43:18 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"),require("../../addon/mode/simple"),require("../../addon/mode/multiplex"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","../../addon/mode/simple","../../addon/mode/multiplex"],e);else e(CodeMirror)})(function(e){"use strict";e.defineSimpleMode("handlebars-tags",{start:[{regex:/\{\{\{/,push:"handlebars_raw",token:"tag"},{regex:/\{\{!--/,push:"dash_comment",token:"comment"},{regex:/\{\{!/,push:"comment",token:"comment"},{regex:/\{\{/,push:"handlebars",token:"tag"}],handlebars_raw:[{regex:/\}\}\}/,pop:true,token:"tag"}],handlebars:[{regex:/\}\}/,pop:true,token:"tag"},{regex:/"(?:[^\\"]|\\.)*"?/,token:"string"},{regex:/'(?:[^\\']|\\.)*'?/,token:"string"},{regex:/>|[#\/]([A-Za-z_]\w*)/,token:"keyword"},{regex:/(?:else|this)\b/,token:"keyword"},{regex:/\d+/i,token:"number"},{regex:/=|~|@|true|false/,token:"atom"},{regex:/(?:\.\.\/)*(?:[A-Za-z_][\w\.]*)+/,token:"variable-2"}],dash_comment:[{regex:/--\}\}/,pop:true,token:"comment"},{regex:/./,token:"comment"}],comment:[{regex:/\}\}/,pop:true,token:"comment"},{regex:/./,token:"comment"}],meta:{blockCommentStart:"{{--",blockCommentEnd:"--}}"}});e.defineMode("handlebars",function(t,o){var r=e.getMode(t,"handlebars-tags");if(!o||!o.base)return r;return e.multiplexingMode(e.getMode(t,o.base),{open:"{{",close:/\}\}\}?/,mode:r,parseDelimiters:true})});e.defineMIME("text/x-handlebars-template","handlebars")});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../../addon/mode/simple"), require("../../addon/mode/multiplex"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../../addon/mode/simple", "../../addon/mode/multiplex"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineSimpleMode("handlebars-tags", {
+    start: [
+      { regex: /\{\{\{/, push: "handlebars_raw", token: "tag" },
+      { regex: /\{\{!--/, push: "dash_comment", token: "comment" },
+      { regex: /\{\{!/,   push: "comment", token: "comment" },
+      { regex: /\{\{/,    push: "handlebars", token: "tag" }
+    ],
+    handlebars_raw: [
+      { regex: /\}\}\}/, pop: true, token: "tag" },
+    ],
+    handlebars: [
+      { regex: /\}\}/, pop: true, token: "tag" },
+
+      // Double and single quotes
+      { regex: /"(?:[^\\"]|\\.)*"?/, token: "string" },
+      { regex: /'(?:[^\\']|\\.)*'?/, token: "string" },
+
+      // Handlebars keywords
+      { regex: />|[#\/]([A-Za-z_]\w*)/, token: "keyword" },
+      { regex: /(?:else|this)\b/, token: "keyword" },
+
+      // Numeral
+      { regex: /\d+/i, token: "number" },
+
+      // Atoms like = and .
+      { regex: /=|~|@|true|false/, token: "atom" },
+
+      // Paths
+      { regex: /(?:\.\.\/)*(?:[A-Za-z_][\w\.]*)+/, token: "variable-2" }
+    ],
+    dash_comment: [
+      { regex: /--\}\}/, pop: true, token: "comment" },
+
+      // Commented code
+      { regex: /./, token: "comment"}
+    ],
+    comment: [
+      { regex: /\}\}/, pop: true, token: "comment" },
+      { regex: /./, token: "comment" }
+    ],
+    meta: {
+      blockCommentStart: "{{--",
+      blockCommentEnd: "--}}"
+    }
+  });
+
+  CodeMirror.defineMode("handlebars", function(config, parserConfig) {
+    var handlebars = CodeMirror.getMode(config, "handlebars-tags");
+    if (!parserConfig || !parserConfig.base) return handlebars;
+    return CodeMirror.multiplexingMode(
+      CodeMirror.getMode(config, parserConfig.base),
+      {open: "{{", close: /\}\}\}?/, mode: handlebars, parseDelimiters: true}
+    );
+  });
+
+  CodeMirror.defineMIME("text/x-handlebars-template", "handlebars");
+});

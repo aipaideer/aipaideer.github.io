@@ -1,3 +1,72 @@
-// build time:Tue Jun 09 2020 16:43:15 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.runMode=function(t,r,n,a){var i=e.getMode(e.defaults,r);var o=/MSIE \d/.test(navigator.userAgent);var d=o&&(document.documentMode==null||document.documentMode<9);if(n.appendChild){var c=a&&a.tabSize||e.defaults.tabSize;var l=n,f=0;l.innerHTML="";n=function(e,t){if(e=="\n"){l.appendChild(document.createTextNode(d?"\r":e));f=0;return}var r="";for(var n=0;;){var a=e.indexOf("\t",n);if(a==-1){r+=e.slice(n);f+=e.length-n;break}else{f+=a-n;r+=e.slice(n,a);var i=c-f%c;f+=i;for(var o=0;o<i;++o)r+=" ";n=a+1}}if(t){var s=l.appendChild(document.createElement("span"));s.className="cm-"+t.replace(/ +/g," cm-");s.appendChild(document.createTextNode(r))}else{l.appendChild(document.createTextNode(r))}}}var s=e.splitLines(t),u=a&&a.state||e.startState(i);for(var p=0,m=s.length;p<m;++p){if(p)n("\n");var v=new e.StringStream(s[p]);if(!v.string&&i.blankLine)i.blankLine(u);while(!v.eol()){var b=i.token(v,u);n(v.current(),b,p,v.start,u);v.start=v.pos}}}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.runMode = function(string, modespec, callback, options) {
+  var mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
+  var ie = /MSIE \d/.test(navigator.userAgent);
+  var ie_lt9 = ie && (document.documentMode == null || document.documentMode < 9);
+
+  if (callback.appendChild) {
+    var tabSize = (options && options.tabSize) || CodeMirror.defaults.tabSize;
+    var node = callback, col = 0;
+    node.innerHTML = "";
+    callback = function(text, style) {
+      if (text == "\n") {
+        // Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
+        // Emitting a carriage return makes everything ok.
+        node.appendChild(document.createTextNode(ie_lt9 ? '\r' : text));
+        col = 0;
+        return;
+      }
+      var content = "";
+      // replace tabs
+      for (var pos = 0;;) {
+        var idx = text.indexOf("\t", pos);
+        if (idx == -1) {
+          content += text.slice(pos);
+          col += text.length - pos;
+          break;
+        } else {
+          col += idx - pos;
+          content += text.slice(pos, idx);
+          var size = tabSize - col % tabSize;
+          col += size;
+          for (var i = 0; i < size; ++i) content += " ";
+          pos = idx + 1;
+        }
+      }
+
+      if (style) {
+        var sp = node.appendChild(document.createElement("span"));
+        sp.className = "cm-" + style.replace(/ +/g, " cm-");
+        sp.appendChild(document.createTextNode(content));
+      } else {
+        node.appendChild(document.createTextNode(content));
+      }
+    };
+  }
+
+  var lines = CodeMirror.splitLines(string), state = (options && options.state) || CodeMirror.startState(mode);
+  for (var i = 0, e = lines.length; i < e; ++i) {
+    if (i) callback("\n");
+    var stream = new CodeMirror.StringStream(lines[i]);
+    if (!stream.string && mode.blankLine) mode.blankLine(state);
+    while (!stream.eol()) {
+      var style = mode.token(stream, state);
+      callback(stream.current(), style, i, stream.start, state);
+      stream.start = stream.pos;
+    }
+  }
+};
+
+});

@@ -1,3 +1,165 @@
-// build time:Tue Jun 09 2020 16:43:15 GMT+0800 (Central Standard Time)
-(function(t){if(typeof exports=="object"&&typeof module=="object")t(require("../../lib/codemirror"),require("./matchesonscrollbar"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","./matchesonscrollbar"],t);else t(CodeMirror)})(function(t){"use strict";var e={style:"matchhighlight",minChars:2,delay:100,wordsOnly:false,annotateScrollbar:false,showToken:false,trim:true};function i(t){this.options={};for(var i in e)this.options[i]=(t&&t.hasOwnProperty(i)?t:e)[i];this.overlay=this.timeout=null;this.matchesonscroll=null;this.active=false}t.defineOption("highlightSelectionMatches",false,function(e,n,a){if(a&&a!=t.Init){s(e);clearTimeout(e.state.matchHighlighter.timeout);e.state.matchHighlighter=null;e.off("cursorActivity",r);e.off("focus",o)}if(n){var c=e.state.matchHighlighter=new i(n);if(e.hasFocus()){c.active=true;l(e)}else{e.on("focus",o)}e.on("cursorActivity",r)}});function r(t){var e=t.state.matchHighlighter;if(e.active||t.hasFocus())n(t,e)}function o(t){var e=t.state.matchHighlighter;if(!e.active){e.active=true;n(t,e)}}function n(t,e){clearTimeout(e.timeout);e.timeout=setTimeout(function(){l(t)},e.options.delay)}function a(t,e,i,r){var o=t.state.matchHighlighter;t.addOverlay(o.overlay=f(e,i,r));if(o.options.annotateScrollbar&&t.showMatchesOnScrollbar){var n=i?new RegExp("\\b"+e.replace(/[\\\[.+*?(){|^$]/g,"\\$&")+"\\b"):e;o.matchesonscroll=t.showMatchesOnScrollbar(n,false,{className:"CodeMirror-selection-highlight-scrollbar"})}}function s(t){var e=t.state.matchHighlighter;if(e.overlay){t.removeOverlay(e.overlay);e.overlay=null;if(e.matchesonscroll){e.matchesonscroll.clear();e.matchesonscroll=null}}}function l(t){t.operation(function(){var e=t.state.matchHighlighter;s(t);if(!t.somethingSelected()&&e.options.showToken){var i=e.options.showToken===true?/[\w$]/:e.options.showToken;var r=t.getCursor(),o=t.getLine(r.line),n=r.ch,l=n;while(n&&i.test(o.charAt(n-1)))--n;while(l<o.length&&i.test(o.charAt(l)))++l;if(n<l)a(t,o.slice(n,l),i,e.options.style);return}var h=t.getCursor("from"),f=t.getCursor("to");if(h.line!=f.line)return;if(e.options.wordsOnly&&!c(t,h,f))return;var u=t.getRange(h,f);if(e.options.trim)u=u.replace(/^\s+|\s+$/g,"");if(u.length>=e.options.minChars)a(t,u,false,e.options.style)})}function c(t,e,i){var r=t.getRange(e,i);if(r.match(/^\w+$/)!==null){if(e.ch>0){var o={line:e.line,ch:e.ch-1};var n=t.getRange(o,e);if(n.match(/\W/)===null)return false}if(i.ch<t.getLine(e.line).length){var o={line:i.line,ch:i.ch+1};var n=t.getRange(i,o);if(n.match(/\W/)===null)return false}return true}else return false}function h(t,e){return(!t.start||!e.test(t.string.charAt(t.start-1)))&&(t.pos==t.string.length||!e.test(t.string.charAt(t.pos)))}function f(t,e,i){return{token:function(r){if(r.match(t)&&(!e||h(r,e)))return i;r.next();r.skipTo(t.charAt(0))||r.skipToEnd()}}}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+// Highlighting text that matches the selection
+//
+// Defines an option highlightSelectionMatches, which, when enabled,
+// will style strings that match the selection throughout the
+// document.
+//
+// The option can be set to true to simply enable it, or to a
+// {minChars, style, wordsOnly, showToken, delay} object to explicitly
+// configure it. minChars is the minimum amount of characters that should be
+// selected for the behavior to occur, and style is the token style to
+// apply to the matches. This will be prefixed by "cm-" to create an
+// actual CSS class name. If wordsOnly is enabled, the matches will be
+// highlighted only if the selected text is a word. showToken, when enabled,
+// will cause the current token to be highlighted when nothing is selected.
+// delay is used to specify how much time to wait, in milliseconds, before
+// highlighting the matches. If annotateScrollbar is enabled, the occurences
+// will be highlighted on the scrollbar via the matchesonscrollbar addon.
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("./matchesonscrollbar"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "./matchesonscrollbar"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var defaults = {
+    style: "matchhighlight",
+    minChars: 2,
+    delay: 100,
+    wordsOnly: false,
+    annotateScrollbar: false,
+    showToken: false,
+    trim: true
+  }
+
+  function State(options) {
+    this.options = {}
+    for (var name in defaults)
+      this.options[name] = (options && options.hasOwnProperty(name) ? options : defaults)[name]
+    this.overlay = this.timeout = null;
+    this.matchesonscroll = null;
+    this.active = false;
+  }
+
+  CodeMirror.defineOption("highlightSelectionMatches", false, function(cm, val, old) {
+    if (old && old != CodeMirror.Init) {
+      removeOverlay(cm);
+      clearTimeout(cm.state.matchHighlighter.timeout);
+      cm.state.matchHighlighter = null;
+      cm.off("cursorActivity", cursorActivity);
+      cm.off("focus", onFocus)
+    }
+    if (val) {
+      var state = cm.state.matchHighlighter = new State(val);
+      if (cm.hasFocus()) {
+        state.active = true
+        highlightMatches(cm)
+      } else {
+        cm.on("focus", onFocus)
+      }
+      cm.on("cursorActivity", cursorActivity);
+    }
+  });
+
+  function cursorActivity(cm) {
+    var state = cm.state.matchHighlighter;
+    if (state.active || cm.hasFocus()) scheduleHighlight(cm, state)
+  }
+
+  function onFocus(cm) {
+    var state = cm.state.matchHighlighter
+    if (!state.active) {
+      state.active = true
+      scheduleHighlight(cm, state)
+    }
+  }
+
+  function scheduleHighlight(cm, state) {
+    clearTimeout(state.timeout);
+    state.timeout = setTimeout(function() {highlightMatches(cm);}, state.options.delay);
+  }
+
+  function addOverlay(cm, query, hasBoundary, style) {
+    var state = cm.state.matchHighlighter;
+    cm.addOverlay(state.overlay = makeOverlay(query, hasBoundary, style));
+    if (state.options.annotateScrollbar && cm.showMatchesOnScrollbar) {
+      var searchFor = hasBoundary ? new RegExp("\\b" + query.replace(/[\\\[.+*?(){|^$]/g, "\\$&") + "\\b") : query;
+      state.matchesonscroll = cm.showMatchesOnScrollbar(searchFor, false,
+        {className: "CodeMirror-selection-highlight-scrollbar"});
+    }
+  }
+
+  function removeOverlay(cm) {
+    var state = cm.state.matchHighlighter;
+    if (state.overlay) {
+      cm.removeOverlay(state.overlay);
+      state.overlay = null;
+      if (state.matchesonscroll) {
+        state.matchesonscroll.clear();
+        state.matchesonscroll = null;
+      }
+    }
+  }
+
+  function highlightMatches(cm) {
+    cm.operation(function() {
+      var state = cm.state.matchHighlighter;
+      removeOverlay(cm);
+      if (!cm.somethingSelected() && state.options.showToken) {
+        var re = state.options.showToken === true ? /[\w$]/ : state.options.showToken;
+        var cur = cm.getCursor(), line = cm.getLine(cur.line), start = cur.ch, end = start;
+        while (start && re.test(line.charAt(start - 1))) --start;
+        while (end < line.length && re.test(line.charAt(end))) ++end;
+        if (start < end)
+          addOverlay(cm, line.slice(start, end), re, state.options.style);
+        return;
+      }
+      var from = cm.getCursor("from"), to = cm.getCursor("to");
+      if (from.line != to.line) return;
+      if (state.options.wordsOnly && !isWord(cm, from, to)) return;
+      var selection = cm.getRange(from, to)
+      if (state.options.trim) selection = selection.replace(/^\s+|\s+$/g, "")
+      if (selection.length >= state.options.minChars)
+        addOverlay(cm, selection, false, state.options.style);
+    });
+  }
+
+  function isWord(cm, from, to) {
+    var str = cm.getRange(from, to);
+    if (str.match(/^\w+$/) !== null) {
+        if (from.ch > 0) {
+            var pos = {line: from.line, ch: from.ch - 1};
+            var chr = cm.getRange(pos, from);
+            if (chr.match(/\W/) === null) return false;
+        }
+        if (to.ch < cm.getLine(from.line).length) {
+            var pos = {line: to.line, ch: to.ch + 1};
+            var chr = cm.getRange(to, pos);
+            if (chr.match(/\W/) === null) return false;
+        }
+        return true;
+    } else return false;
+  }
+
+  function boundariesAround(stream, re) {
+    return (!stream.start || !re.test(stream.string.charAt(stream.start - 1))) &&
+      (stream.pos == stream.string.length || !re.test(stream.string.charAt(stream.pos)));
+  }
+
+  function makeOverlay(query, hasBoundary, style) {
+    return {token: function(stream) {
+      if (stream.match(query) &&
+          (!hasBoundary || boundariesAround(stream, hasBoundary)))
+        return style;
+      stream.next();
+      stream.skipTo(query.charAt(0)) || stream.skipToEnd();
+    }};
+  }
+});

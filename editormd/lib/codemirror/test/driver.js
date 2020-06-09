@@ -1,3 +1,141 @@
-// build time:Tue Jun 09 2020 16:43:07 GMT+0800 (Central Standard Time)
-var tests=[],filters=[],nameCounts={};function Failure(e){this.message=e}Failure.prototype.toString=function(){return this.message};function indexOf(e,t){if(e.indexOf)return e.indexOf(t);for(var n=0,i=e.length;n<i;++n)if(e[n]==t)return n;return-1}function test(e,t,n){if(nameCounts[e]==undefined){nameCounts[e]=2}else{e=e+"_"+nameCounts[e]++}tests.push({name:e,func:t,expectedFail:n});return e}var namespace="";function testCM(e,t,n,i){return test(namespace+e,function(){var e=document.getElementById("testground"),i=window.cm=CodeMirror(e,n);var r=false;try{t(i);r=true}finally{if(!r||verbose){e.style.visibility="visible"}else{e.removeChild(i.getWrapperElement())}}},i)}function runTests(e){var t=0;function n(i){for(;;){if(i===tests.length){running=false;return e("done")}var r=tests[i],s=false;if(filters.length){s=true;for(var a=0;a<filters.length;a++)if(r.name.match(filters[a]))s=false}if(s){e("skipped",r.name,o);i++}else{break}}var l=r.expectedFail,f=+new Date,u=false;try{var o=r.func()}catch(c){u=true;if(l)e("expected",r.name);else if(c instanceof Failure)e("fail",r.name,c.message);else{var h=/(?:\bat |@).*?([^\/:]+):(\d+)/.exec(c.stack);if(h)console["log"](c.stack);e("error",r.name,c.toString()+(h?" ("+h[1]+":"+h[2]+")":""))}}if(!u){if(l)e("fail",r.name,o||"expected failure, but passed");else e("ok",r.name,o)}if(!quit){var m=0;t+=+new Date-f;if(t>500){t=0;m=50}setTimeout(function(){n(i+1)},m)}else{running=false;return null}}n(0)}function label(e,t){if(t)return e+" ("+t+")";return e}function eq(e,t,n){if(e!=t)throw new Failure(label(e+" != "+t,n))}function near(e,t,n,i){if(Math.abs(e-t)>n)throw new Failure(label(e+" is not close to "+t+" ("+n+")",i))}function eqCharPos(e,t,n){function i(e){return"{line:"+e.line+",ch:"+e.ch+",sticky:"+e.sticky+"}"}if(e==t)return;if(e==null)throw new Failure(label("comparing null to "+i(t),n));if(t==null)throw new Failure(label("comparing "+i(e)+" to null",n));if(e.line!=t.line||e.ch!=t.ch)throw new Failure(label(i(e)+" != "+i(t),n))}function eqCursorPos(e,t,n){eqCharPos(e,t,n);if(e)eq(e.sticky,t.sticky,n?n+" (sticky)":"sticky")}function is(e,t){if(!e)throw new Failure(label("assertion failed",t))}function countTests(){if(!filters.length)return tests.length;var e=0;for(var t=0;t<tests.length;++t){var n=tests[t].name;for(var i=0;i<filters.length;i++){if(n.match(filters[i])){++e;break}}}return e}function parseTestFilter(e){if(/_\*$/.test(e))return new RegExp("^"+e.slice(0,e.length-2),"i");else return new RegExp(e,"i")}
-//rebuild by neat 
+var tests = [], filters = [], nameCounts = {};
+
+function Failure(why) {this.message = why;}
+Failure.prototype.toString = function() { return this.message; };
+
+function indexOf(collection, elt) {
+  if (collection.indexOf) return collection.indexOf(elt);
+  for (var i = 0, e = collection.length; i < e; ++i)
+    if (collection[i] == elt) return i;
+  return -1;
+}
+
+function test(name, run, expectedFail) {
+  // Force unique names
+  if (nameCounts[name] == undefined){
+    nameCounts[name] = 2;
+  } else { 
+    // Append number if not first test with this name.
+    name = name + '_' + (nameCounts[name]++);
+  }
+  // Add test
+  tests.push({name: name, func: run, expectedFail: expectedFail});
+  return name;
+}
+var namespace = "";
+function testCM(name, run, opts, expectedFail) {
+  return test(namespace + name, function() {
+    var place = document.getElementById("testground"), cm = window.cm = CodeMirror(place, opts);
+    var successful = false;
+    try {
+      run(cm);
+      successful = true;
+    } finally {
+      if (!successful || verbose) {
+        place.style.visibility = "visible";
+      } else {
+        place.removeChild(cm.getWrapperElement());
+      }
+    }
+  }, expectedFail);
+}
+
+function runTests(callback) {
+  var totalTime = 0;
+  function step(i) {
+    for (;;) {
+      if (i === tests.length) {
+        running = false;
+        return callback("done");
+      }
+      var test = tests[i], skip = false;
+      if (filters.length) {
+        skip = true;
+        for (var j = 0; j < filters.length; j++)
+          if (test.name.match(filters[j])) skip = false;
+      }
+      if (skip) {
+        callback("skipped", test.name, message);
+        i++;
+      } else {
+        break;
+      }
+    }
+    var expFail = test.expectedFail, startTime = +new Date, threw = false;
+    try {
+      var message = test.func();
+    } catch(e) {
+      threw = true;
+      if (expFail) callback("expected", test.name);
+      else if (e instanceof Failure) callback("fail", test.name, e.message);
+      else {
+        var pos = /(?:\bat |@).*?([^\/:]+):(\d+)/.exec(e.stack);
+        if (pos) console["log"](e.stack);
+        callback("error", test.name, e.toString() + (pos ? " (" + pos[1] + ":" + pos[2] + ")" : ""));
+      }
+    }
+    if (!threw) {
+      if (expFail) callback("fail", test.name, message || "expected failure, but passed");
+      else callback("ok", test.name, message);
+    }
+    if (!quit) { // Run next test
+      var delay = 0;
+      totalTime += (+new Date) - startTime;
+      if (totalTime > 500){
+        totalTime = 0;
+        delay = 50;
+      }
+      setTimeout(function(){step(i + 1);}, delay);
+    } else { // Quit tests
+      running = false;
+      return null;
+    }
+  }
+  step(0);
+}
+
+function label(str, msg) {
+  if (msg) return str + " (" + msg + ")";
+  return str;
+}
+function eq(a, b, msg) {
+  if (a != b) throw new Failure(label(a + " != " + b, msg));
+}
+function near(a, b, margin, msg) {
+  if (Math.abs(a - b) > margin)
+    throw new Failure(label(a + " is not close to " + b + " (" + margin + ")", msg));
+}
+function eqCharPos(a, b, msg) {
+  function str(p) { return "{line:" + p.line + ",ch:" + p.ch + ",sticky:" + p.sticky + "}"; }
+  if (a == b) return;
+  if (a == null) throw new Failure(label("comparing null to " + str(b), msg));
+  if (b == null) throw new Failure(label("comparing " + str(a) + " to null", msg));
+  if (a.line != b.line || a.ch != b.ch) throw new Failure(label(str(a) + " != " + str(b), msg));
+}
+function eqCursorPos(a, b, msg) {
+  eqCharPos(a, b, msg);
+  if (a) eq(a.sticky, b.sticky, msg ? msg + ' (sticky)' : 'sticky');
+}
+function is(a, msg) {
+  if (!a) throw new Failure(label("assertion failed", msg));
+}
+
+function countTests() {
+  if (!filters.length) return tests.length;
+  var sum = 0;
+  for (var i = 0; i < tests.length; ++i) {
+    var name = tests[i].name;
+    for (var j = 0; j < filters.length; j++) {
+      if (name.match(filters[j])) {
+        ++sum;
+        break;
+      }
+    }
+  }
+  return sum;
+}
+
+function parseTestFilter(s) {
+  if (/_\*$/.test(s)) return new RegExp("^" + s.slice(0, s.length - 2), "i");
+  else return new RegExp(s, "i");
+}

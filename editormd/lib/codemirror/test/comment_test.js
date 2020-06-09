@@ -1,3 +1,114 @@
-// build time:Tue Jun 09 2020 16:43:07 GMT+0800 (Central Standard Time)
-namespace="comment_";(function(){function n(n,o,e,t,m){return testCM(n,function(n){e(n);eq(n.getValue(),m)},{value:t,mode:o})}var o="function foo() {\n  return bar;\n}";var e="foo(/* bar */ true);";var t="foo(/* bar */ true, /* baz */ false);";var m=["above();","foo(/* bar */ true);","below();"];n("block","javascript",function(n){n.blockComment(Pos(0,3),Pos(3,0),{blockCommentLead:" *"})},o+"\n","/* function foo() {\n *   return bar;\n * }\n */");n("blockToggle","javascript",function(n){n.blockComment(Pos(0,3),Pos(2,0),{blockCommentLead:" *"});n.uncomment(Pos(0,3),Pos(2,0),{blockCommentLead:" *"})},o,o);n("blockToggle2","javascript",function(n){n.setCursor({line:0,ch:7});n.execCommand("toggleComment")},e,"foo(bar true);");n("line","javascript",function(n){n.lineComment(Pos(1,1),Pos(1,1))},o,"function foo() {\n//   return bar;\n}");n("lineToggle","javascript",function(n){n.lineComment(Pos(0,0),Pos(2,1));n.uncomment(Pos(0,0),Pos(2,1))},o,o);n("fallbackToBlock","css",function(n){n.lineComment(Pos(0,0),Pos(2,1))},"html {\n  border: none;\n}","/* html {\n  border: none;\n} */");n("fallbackToLine","ruby",function(n){n.blockComment(Pos(0,0),Pos(1))},"def blah()\n  return hah\n","# def blah()\n#   return hah\n");n("ignoreExternalBlockComments","javascript",function(n){n.execCommand("toggleComment")},t,"// "+t);n("ignoreExternalBlockComments2","javascript",function(n){n.setCursor({line:0,ch:null});n.execCommand("toggleComment")},t,"// "+t);n("ignoreExternalBlockCommentsMultiLineAbove","javascript",function(n){n.setSelection({line:0,ch:0},{line:1,ch:1});n.execCommand("toggleComment")},m.join("\n"),["// "+m[0],"// "+m[1],m[2]].join("\n"));n("ignoreExternalBlockCommentsMultiLineBelow","javascript",function(n){n.setSelection({line:1,ch:13},{line:2,ch:1});n.execCommand("toggleComment")},m.join("\n"),[m[0],"// "+m[1],"// "+m[2]].join("\n"));n("commentRange","javascript",function(n){n.blockComment(Pos(1,2),Pos(1,13),{fullLines:false})},o,"function foo() {\n  /*return bar;*/\n}");n("indented","javascript",function(n){n.lineComment(Pos(1,0),Pos(2),{indent:true})},o,"function foo() {\n//   return bar;\n// }");n("singleEmptyLine","javascript",function(n){n.setCursor(1);n.execCommand("toggleComment")},"a;\n\nb;","a;\n// \nb;");n("dontMessWithStrings","javascript",function(n){n.execCommand("toggleComment")},'console.log("/*string*/");','// console.log("/*string*/");');n("dontMessWithStrings2","javascript",function(n){n.execCommand("toggleComment")},'console.log("// string");','// console.log("// string");');n("dontMessWithStrings3","javascript",function(n){n.execCommand("toggleComment")},'// console.log("// string");','console.log("// string");');n("includeLastLine","javascript",function(n){n.execCommand("selectAll");n.execCommand("toggleComment")},"// foo\n// bar\nbaz","// // foo\n// // bar\n// baz");n("uncommentWithTrailingBlockEnd","xml",function(n){n.execCommand("toggleComment")},"<!-- foo --> -->","foo -->");n("dontCommentInComment","xml",function(n){n.setCursor(1,0);n.execCommand("toggleComment")},"<!-- foo\nbar -->","<!-- foo\nbar -->")})();
-//rebuild by neat 
+namespace = "comment_";
+
+(function() {
+  function test(name, mode, run, before, after) {
+    return testCM(name, function(cm) {
+      run(cm);
+      eq(cm.getValue(), after);
+    }, {value: before, mode: mode});
+  }
+
+  var simpleProg = "function foo() {\n  return bar;\n}";
+  var inlineBlock = "foo(/* bar */ true);";
+  var inlineBlocks = "foo(/* bar */ true, /* baz */ false);";
+  var multiLineInlineBlock = ["above();", "foo(/* bar */ true);", "below();"];
+
+  test("block", "javascript", function(cm) {
+    cm.blockComment(Pos(0, 3), Pos(3, 0), {blockCommentLead: " *"});
+  }, simpleProg + "\n", "/* function foo() {\n *   return bar;\n * }\n */");
+
+  test("blockToggle", "javascript", function(cm) {
+    cm.blockComment(Pos(0, 3), Pos(2, 0), {blockCommentLead: " *"});
+    cm.uncomment(Pos(0, 3), Pos(2, 0), {blockCommentLead: " *"});
+  }, simpleProg, simpleProg);
+
+  test("blockToggle2", "javascript", function(cm) {
+    cm.setCursor({line: 0, ch: 7 /* inside the block comment */});
+    cm.execCommand("toggleComment");
+  }, inlineBlock, "foo(bar true);");
+
+  // This test should work but currently fails.
+  // test("blockToggle3", "javascript", function(cm) {
+  //   cm.setCursor({line: 0, ch: 7 /* inside the first block comment */});
+  //   cm.execCommand("toggleComment");
+  // }, inlineBlocks, "foo(bar true, /* baz */ false);");
+
+  test("line", "javascript", function(cm) {
+    cm.lineComment(Pos(1, 1), Pos(1, 1));
+  }, simpleProg, "function foo() {\n//   return bar;\n}");
+
+  test("lineToggle", "javascript", function(cm) {
+    cm.lineComment(Pos(0, 0), Pos(2, 1));
+    cm.uncomment(Pos(0, 0), Pos(2, 1));
+  }, simpleProg, simpleProg);
+
+  test("fallbackToBlock", "css", function(cm) {
+    cm.lineComment(Pos(0, 0), Pos(2, 1));
+  }, "html {\n  border: none;\n}", "/* html {\n  border: none;\n} */");
+
+  test("fallbackToLine", "ruby", function(cm) {
+    cm.blockComment(Pos(0, 0), Pos(1));
+  }, "def blah()\n  return hah\n", "# def blah()\n#   return hah\n");
+
+  test("ignoreExternalBlockComments", "javascript", function(cm) {
+    cm.execCommand("toggleComment");
+  }, inlineBlocks, "// " + inlineBlocks);
+
+  test("ignoreExternalBlockComments2", "javascript", function(cm) {
+    cm.setCursor({line: 0, ch: null /* eol */});
+    cm.execCommand("toggleComment");
+  }, inlineBlocks, "// " + inlineBlocks);
+
+  test("ignoreExternalBlockCommentsMultiLineAbove", "javascript", function(cm) {
+    cm.setSelection({line: 0, ch: 0}, {line: 1, ch: 1});
+    cm.execCommand("toggleComment");
+  }, multiLineInlineBlock.join("\n"), ["// " + multiLineInlineBlock[0],
+                                       "// " + multiLineInlineBlock[1],
+                                       multiLineInlineBlock[2]].join("\n"));
+
+  test("ignoreExternalBlockCommentsMultiLineBelow", "javascript", function(cm) {
+    cm.setSelection({line: 1, ch: 13 /* after end of block comment */}, {line: 2, ch: 1});
+    cm.execCommand("toggleComment");
+  }, multiLineInlineBlock.join("\n"), [multiLineInlineBlock[0],
+                                       "// " + multiLineInlineBlock[1],
+                                       "// " + multiLineInlineBlock[2]].join("\n"));
+
+  test("commentRange", "javascript", function(cm) {
+    cm.blockComment(Pos(1, 2), Pos(1, 13), {fullLines: false});
+  }, simpleProg, "function foo() {\n  /*return bar;*/\n}");
+
+  test("indented", "javascript", function(cm) {
+    cm.lineComment(Pos(1, 0), Pos(2), {indent: true});
+  }, simpleProg, "function foo() {\n//   return bar;\n// }");
+
+  test("singleEmptyLine", "javascript", function(cm) {
+    cm.setCursor(1);
+    cm.execCommand("toggleComment");
+  }, "a;\n\nb;", "a;\n// \nb;");
+
+  test("dontMessWithStrings", "javascript", function(cm) {
+    cm.execCommand("toggleComment");
+  }, "console.log(\"/*string*/\");", "// console.log(\"/*string*/\");");
+
+  test("dontMessWithStrings2", "javascript", function(cm) {
+    cm.execCommand("toggleComment");
+  }, "console.log(\"// string\");", "// console.log(\"// string\");");
+
+  test("dontMessWithStrings3", "javascript", function(cm) {
+    cm.execCommand("toggleComment");
+  }, "// console.log(\"// string\");", "console.log(\"// string\");");
+
+  test("includeLastLine", "javascript", function(cm) {
+    cm.execCommand("selectAll")
+    cm.execCommand("toggleComment")
+  }, "// foo\n// bar\nbaz", "// // foo\n// // bar\n// baz")
+
+  test("uncommentWithTrailingBlockEnd", "xml", function(cm) {
+    cm.execCommand("toggleComment")
+  }, "<!-- foo --> -->", "foo -->")
+
+  test("dontCommentInComment", "xml", function(cm) {
+    cm.setCursor(1, 0)
+    cm.execCommand("toggleComment")
+  }, "<!-- foo\nbar -->", "<!-- foo\nbar -->")
+})();

@@ -1,3 +1,122 @@
-// build time:Tue Jun 09 2020 16:43:15 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.defineExtension("annotateScrollbar",function(e){if(typeof e=="string")e={className:e};return new t(this,e)});e.defineOption("scrollButtonHeight",0);function t(e,t){this.cm=e;this.options=t;this.buttonHeight=t.scrollButtonHeight||e.getOption("scrollButtonHeight");this.annotations=[];this.doRedraw=this.doUpdate=null;this.div=e.getWrapperElement().appendChild(document.createElement("div"));this.div.style.cssText="position: absolute; right: 0; top: 0; z-index: 7; pointer-events: none";this.computeScale();function i(e){clearTimeout(n.doRedraw);n.doRedraw=setTimeout(function(){n.redraw()},e)}var n=this;e.on("refresh",this.resizeHandler=function(){clearTimeout(n.doUpdate);n.doUpdate=setTimeout(function(){if(n.computeScale())i(20)},100)});e.on("markerAdded",this.resizeHandler);e.on("markerCleared",this.resizeHandler);if(t.listenForChanges!==false)e.on("changes",this.changeHandler=function(){i(250)})}t.prototype.computeScale=function(){var e=this.cm;var t=(e.getWrapperElement().clientHeight-e.display.barHeight-this.buttonHeight*2)/e.getScrollerElement().scrollHeight;if(t!=this.hScale){this.hScale=t;return true}};t.prototype.update=function(e){this.annotations=e;this.redraw()};t.prototype.redraw=function(e){if(e!==false)this.computeScale();var t=this.cm,i=this.hScale;var n=document.createDocumentFragment(),o=this.annotations;var r=t.getOption("lineWrapping");var a=r&&t.defaultTextHeight()*1.5;var s=null,h=null;function l(e,i){if(s!=e.line){s=e.line;h=t.getLineHandle(s)}if(h.widgets&&h.widgets.length||r&&h.height>a)return t.charCoords(e,"local")[i?"top":"bottom"];var n=t.heightAtLine(h,"local");return n+(i?0:h.height)}var d=t.lastLine();if(t.display.barWidth)for(var c=0,f;c<o.length;c++){var u=o[c];if(u.to.line>d)continue;var p=f||l(u.from,true)*i;var m=l(u.to,false)*i;while(c<o.length-1){if(o[c+1].to.line>d)break;f=l(o[c+1].from,true)*i;if(f>m+.9)break;u=o[++c];m=l(u.to,false)*i}if(m==p)continue;var g=Math.max(m-p,3);var v=n.appendChild(document.createElement("div"));v.style.cssText="position: absolute; right: 0px; width: "+Math.max(t.display.barWidth-1,2)+"px; top: "+(p+this.buttonHeight)+"px; height: "+g+"px";v.className=this.options.className;if(u.id){v.setAttribute("annotation-id",u.id)}}this.div.textContent="";this.div.appendChild(n)};t.prototype.clear=function(){this.cm.off("refresh",this.resizeHandler);this.cm.off("markerAdded",this.resizeHandler);this.cm.off("markerCleared",this.resizeHandler);if(this.changeHandler)this.cm.off("changes",this.changeHandler);this.div.parentNode.removeChild(this.div)}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineExtension("annotateScrollbar", function(options) {
+    if (typeof options == "string") options = {className: options};
+    return new Annotation(this, options);
+  });
+
+  CodeMirror.defineOption("scrollButtonHeight", 0);
+
+  function Annotation(cm, options) {
+    this.cm = cm;
+    this.options = options;
+    this.buttonHeight = options.scrollButtonHeight || cm.getOption("scrollButtonHeight");
+    this.annotations = [];
+    this.doRedraw = this.doUpdate = null;
+    this.div = cm.getWrapperElement().appendChild(document.createElement("div"));
+    this.div.style.cssText = "position: absolute; right: 0; top: 0; z-index: 7; pointer-events: none";
+    this.computeScale();
+
+    function scheduleRedraw(delay) {
+      clearTimeout(self.doRedraw);
+      self.doRedraw = setTimeout(function() { self.redraw(); }, delay);
+    }
+
+    var self = this;
+    cm.on("refresh", this.resizeHandler = function() {
+      clearTimeout(self.doUpdate);
+      self.doUpdate = setTimeout(function() {
+        if (self.computeScale()) scheduleRedraw(20);
+      }, 100);
+    });
+    cm.on("markerAdded", this.resizeHandler);
+    cm.on("markerCleared", this.resizeHandler);
+    if (options.listenForChanges !== false)
+      cm.on("changes", this.changeHandler = function() {
+        scheduleRedraw(250);
+      });
+  }
+
+  Annotation.prototype.computeScale = function() {
+    var cm = this.cm;
+    var hScale = (cm.getWrapperElement().clientHeight - cm.display.barHeight - this.buttonHeight * 2) /
+      cm.getScrollerElement().scrollHeight
+    if (hScale != this.hScale) {
+      this.hScale = hScale;
+      return true;
+    }
+  };
+
+  Annotation.prototype.update = function(annotations) {
+    this.annotations = annotations;
+    this.redraw();
+  };
+
+  Annotation.prototype.redraw = function(compute) {
+    if (compute !== false) this.computeScale();
+    var cm = this.cm, hScale = this.hScale;
+
+    var frag = document.createDocumentFragment(), anns = this.annotations;
+
+    var wrapping = cm.getOption("lineWrapping");
+    var singleLineH = wrapping && cm.defaultTextHeight() * 1.5;
+    var curLine = null, curLineObj = null;
+    function getY(pos, top) {
+      if (curLine != pos.line) {
+        curLine = pos.line;
+        curLineObj = cm.getLineHandle(curLine);
+      }
+      if ((curLineObj.widgets && curLineObj.widgets.length) ||
+          (wrapping && curLineObj.height > singleLineH))
+        return cm.charCoords(pos, "local")[top ? "top" : "bottom"];
+      var topY = cm.heightAtLine(curLineObj, "local");
+      return topY + (top ? 0 : curLineObj.height);
+    }
+
+    var lastLine = cm.lastLine()
+    if (cm.display.barWidth) for (var i = 0, nextTop; i < anns.length; i++) {
+      var ann = anns[i];
+      if (ann.to.line > lastLine) continue;
+      var top = nextTop || getY(ann.from, true) * hScale;
+      var bottom = getY(ann.to, false) * hScale;
+      while (i < anns.length - 1) {
+        if (anns[i + 1].to.line > lastLine) break;
+        nextTop = getY(anns[i + 1].from, true) * hScale;
+        if (nextTop > bottom + .9) break;
+        ann = anns[++i];
+        bottom = getY(ann.to, false) * hScale;
+      }
+      if (bottom == top) continue;
+      var height = Math.max(bottom - top, 3);
+
+      var elt = frag.appendChild(document.createElement("div"));
+      elt.style.cssText = "position: absolute; right: 0px; width: " + Math.max(cm.display.barWidth - 1, 2) + "px; top: "
+        + (top + this.buttonHeight) + "px; height: " + height + "px";
+      elt.className = this.options.className;
+      if (ann.id) {
+        elt.setAttribute("annotation-id", ann.id);
+      }
+    }
+    this.div.textContent = "";
+    this.div.appendChild(frag);
+  };
+
+  Annotation.prototype.clear = function() {
+    this.cm.off("refresh", this.resizeHandler);
+    this.cm.off("markerAdded", this.resizeHandler);
+    this.cm.off("markerCleared", this.resizeHandler);
+    if (this.changeHandler) this.cm.off("changes", this.changeHandler);
+    this.div.parentNode.removeChild(this.div);
+  };
+});

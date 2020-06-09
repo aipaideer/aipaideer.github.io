@@ -1,3 +1,51 @@
-// build time:Tue Jun 09 2020 16:43:12 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.defineOption("rulers",false,function(e,t){if(e.state.rulerDiv){e.state.rulerDiv.parentElement.removeChild(e.state.rulerDiv);e.state.rulerDiv=null;e.off("refresh",r)}if(t&&t.length){e.state.rulerDiv=e.display.lineSpace.parentElement.insertBefore(document.createElement("div"),e.display.lineSpace);e.state.rulerDiv.className="CodeMirror-rulers";r(e);e.on("refresh",r)}});function r(r){r.state.rulerDiv.textContent="";var t=r.getOption("rulers");var i=r.defaultCharWidth();var l=r.charCoords(e.Pos(r.firstLine(),0),"div").left;r.state.rulerDiv.style.minHeight=r.display.scroller.offsetHeight+30+"px";for(var o=0;o<t.length;o++){var s=document.createElement("div");s.className="CodeMirror-ruler";var a,n=t[o];if(typeof n=="number"){a=n}else{a=n.column;if(n.className)s.className+=" "+n.className;if(n.color)s.style.borderColor=n.color;if(n.lineStyle)s.style.borderLeftStyle=n.lineStyle;if(n.width)s.style.borderLeftWidth=n.width}s.style.left=l+a*i+"px";r.state.rulerDiv.appendChild(s)}}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineOption("rulers", false, function(cm, val) {
+    if (cm.state.rulerDiv) {
+      cm.state.rulerDiv.parentElement.removeChild(cm.state.rulerDiv)
+      cm.state.rulerDiv = null
+      cm.off("refresh", drawRulers)
+    }
+    if (val && val.length) {
+      cm.state.rulerDiv = cm.display.lineSpace.parentElement.insertBefore(document.createElement("div"), cm.display.lineSpace)
+      cm.state.rulerDiv.className = "CodeMirror-rulers"
+      drawRulers(cm)
+      cm.on("refresh", drawRulers)
+    }
+  });
+
+  function drawRulers(cm) {
+    cm.state.rulerDiv.textContent = ""
+    var val = cm.getOption("rulers");
+    var cw = cm.defaultCharWidth();
+    var left = cm.charCoords(CodeMirror.Pos(cm.firstLine(), 0), "div").left;
+    cm.state.rulerDiv.style.minHeight = (cm.display.scroller.offsetHeight + 30) + "px";
+    for (var i = 0; i < val.length; i++) {
+      var elt = document.createElement("div");
+      elt.className = "CodeMirror-ruler";
+      var col, conf = val[i];
+      if (typeof conf == "number") {
+        col = conf;
+      } else {
+        col = conf.column;
+        if (conf.className) elt.className += " " + conf.className;
+        if (conf.color) elt.style.borderColor = conf.color;
+        if (conf.lineStyle) elt.style.borderLeftStyle = conf.lineStyle;
+        if (conf.width) elt.style.borderLeftWidth = conf.width;
+      }
+      elt.style.left = (left + col * cw) + "px";
+      cm.state.rulerDiv.appendChild(elt)
+    }
+  }
+});

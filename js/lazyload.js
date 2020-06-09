@@ -1,3 +1,70 @@
-// build time:Tue Jun 09 2020 16:43:05 GMT+0800 (Central Standard Time)
-!function(t,n){var e=Array.prototype.slice.call(n.querySelectorAll("img[srcset]"));function r(e){var r=e.getBoundingClientRect();var i=t.innerHeight||n.documentElement.clientHeight;return r.top>=0&&r.left>=0&&r.top<=i*3}function i(t,n){var e=new Image;var r=t.getAttribute("src");e.onload=function(){t.srcset=r;n&&n()};e.srcset=r}function o(){for(var n=0;n<e.length;n++){if(r(e[n])){(function(t){var n=e[t];i(n,function(){e=e.filter(function(t){return n!==t})})})(n)}}if(e.length===0){t.removeEventListener("scroll",l)}}function c(t,n){clearTimeout(t.tId);t.tId=setTimeout(function(){t.call(n)},100)}var l=function(){c(o,t)};o();t.addEventListener("scroll",l)}(window,document);
-//rebuild by neat 
+// eslint-disable-next-line no-unused-expressions
+!(function(window, document) {
+  var runningOnBrowser = typeof window !== 'undefined';
+  var supportsIntersectionObserver = runningOnBrowser && 'IntersectionObserver' in window;
+
+  var images = Array.prototype.slice.call(document.querySelectorAll('img[srcset]'));
+  if (!images || images.length === 0) {
+    return;
+  }
+
+  if (supportsIntersectionObserver) {
+    var io = new IntersectionObserver(function(changes) {
+      changes.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting) return;
+        target.setAttribute('srcset', target.src);
+        target.onload = target.onerror = () => io.unobserve(target);
+      });
+    }, {
+      threshold : [0],
+      rootMargin: (window.innerHeight || document.documentElement.clientHeight) + 'px'
+    });
+    images.map((item) => io.observe(item));
+  } else {
+    // eslint-disable-next-line no-inner-declarations
+    function elementInViewport(el) {
+      var rect = el.getBoundingClientRect();
+      var height = window.innerHeight || document.documentElement.clientHeight;
+      var top = rect.top;
+      return (top >= 0 && top <= height * 3) || (top <= 0 && top <= -(height * 2) - rect.height);
+    }
+
+    // eslint-disable-next-line no-inner-declarations
+    function loadImage(el, fn) {
+      var img = new Image();
+      var src = el.getAttribute('src');
+      img.onload = function() {
+        el.srcset = src;
+        fn && fn();
+      };
+      img.srcset = src;
+    }
+
+    // eslint-disable-next-line no-undef
+    var lazyLoader = new Debouncer(processImages);
+
+    // eslint-disable-next-line no-inner-declarations
+    function processImages() {
+      for (var i = 0; i < images.length; i++) {
+        if (elementInViewport(images[i])) {
+          // eslint-disable-next-line no-loop-func
+          (function(index) {
+            var loadingImage = images[index];
+            loadImage(loadingImage, function() {
+              images = images.filter(function(t) {
+                return loadingImage !== t;
+              });
+            });
+          })(i);
+        }
+      }
+      if (images.length === 0) {
+        window.removeEventListener('scroll', lazyLoader, false);
+      }
+    }
+
+    window.addEventListener('scroll', lazyLoader, false);
+    lazyLoader.handleEvent();
+  }
+
+})(window, document);

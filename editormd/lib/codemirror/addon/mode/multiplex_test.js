@@ -1,3 +1,33 @@
-// build time:Tue Jun 09 2020 16:43:15 GMT+0800 (Central Standard Time)
-(function(){CodeMirror.defineMode("markdown_with_stex",function(){var e=CodeMirror.getMode({},"stex");var o=CodeMirror.getMode({},"markdown");var r={open:"$",close:"$",mode:e,delimStyle:"delim",innerStyle:"inner"};return CodeMirror.multiplexingMode(o,r)});var e=CodeMirror.getMode({},"markdown_with_stex");function o(o){test.mode(o,e,Array.prototype.slice.call(arguments,1),"multiplexing")}o("stexInsideMarkdown","[strong **Equation:**] [delim&delim-open $][inner&tag \\pi][delim&delim-close $]")})();
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function() {
+  CodeMirror.defineMode("markdown_with_stex", function(){
+    var inner = CodeMirror.getMode({}, "stex");
+    var outer = CodeMirror.getMode({}, "markdown");
+
+    var innerOptions = {
+      open: '$',
+      close: '$',
+      mode: inner,
+      delimStyle: 'delim',
+      innerStyle: 'inner'
+    };
+
+    return CodeMirror.multiplexingMode(outer, innerOptions);
+  });
+
+  var mode = CodeMirror.getMode({}, "markdown_with_stex");
+
+  function MT(name) {
+    test.mode(
+      name,
+      mode,
+      Array.prototype.slice.call(arguments, 1),
+      'multiplexing');
+  }
+
+  MT(
+    "stexInsideMarkdown",
+    "[strong **Equation:**] [delim&delim-open $][inner&tag \\pi][delim&delim-close $]");
+})();

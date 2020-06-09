@@ -1,3 +1,83 @@
-// build time:Tue Jun 09 2020 16:43:07 GMT+0800 (Central Standard Time)
-(function(){var e=CodeMirror.Pos;namespace="html-hint_";testData=[{name:"html-element",value:"<htm",list:["<html"]},{name:"element-close",value:"<a href='#a'>\n</",list:["</a>"]},{name:"linkref-attribute",value:"<link hreflang='z",from:e(0,"<link hreflang=".length),list:["'zh'","'za'","'zu'"]},{name:"html-completion",value:"<html>\n",list:["<head","<body","</html>"]}];function t(e){return"<code>"+JSON.stringify(e.list,null,2).replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</code>"}function r(e,r){testCM(e,function(e){e.setValue(r.value);e.setCursor(r.cursor);var l=CodeMirror.hint.html(e);if(!n(l.list,r.list))throw new Failure("Wrong completion results. Got"+t(l)+" but expected"+t(r));eqCharPos(l.from,r.from,"from-failed");eqCharPos(l.to,r.to,"to-failed")},{value:r.value,mode:r.mode||"text/html"})}testData.forEach(function(t){var n=t.value.split(/\n/);t.to=t.pos||e(n.length-1,n[n.length-1].length);t.from=t.from||e(n.length-1,0);t.cursor=t.cursor||t.to;var l=t.name||t.value;r(l,t)});function n(e,t){if(e===t)return true;if(!(e&&typeof e==="object")||!(t&&typeof t==="object"))return false;var r=e instanceof Array;if(t instanceof Array!==r)return false;if(r){if(e.length!==t.length)return false;for(var l=0;l<e.length;l++)if(!n(e[l],t[l]))return false}else{for(var a in e)if(!(a in t)||!n(e[a],t[a]))return false;for(var a in t)if(!(a in e))return false}return true}})();
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function() {
+  var Pos = CodeMirror.Pos;
+
+  namespace = "html-hint_";
+
+  testData =[
+    {
+      name: "html-element",
+      value: "<htm",
+      list: ["<html"]
+    },
+    {
+      name: "element-close",
+      value: "<a href='#a'>\n</",
+      list: ["</a>"]
+    },
+    {
+      name: "linkref-attribute",
+      value: "<link hreflang='z",
+      from: Pos(0,"<link hreflang=".length),
+      list: ["'zh'","'za'","'zu'"]
+    },
+    {
+      name: "html-completion",
+      value: "<html>\n",
+      list: ["<head","<body","</html>"]
+    }
+  ];
+
+  function escapeHtmlList(o) {
+    return '<code>' +
+      JSON.stringify(o.list,null,2)
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;") +
+      '</code>'
+  }
+
+  function test(name, spec) {
+    testCM(name, function(cm) {
+      cm.setValue(spec.value);
+      cm.setCursor(spec.cursor);
+      var completion = CodeMirror.hint.html(cm);
+      if (!deepCompare(completion.list, spec.list))
+        throw new Failure("Wrong completion results. Got" +
+          escapeHtmlList(completion) +" but expected" +
+          escapeHtmlList(spec));
+      eqCharPos(completion.from, spec.from,'from-failed');
+      eqCharPos(completion.to, spec.to, 'to-failed');
+    }, {
+      value: spec.value,
+      mode: spec.mode || "text/html"
+    });
+  }
+
+  testData.forEach(function (value) {
+    // Use sane defaults
+    var lines = value.value.split(/\n/);
+    value.to = value.pos || Pos(lines.length-1, lines[lines.length-1].length);
+    value.from = value.from || Pos(lines.length-1,0);
+    value.cursor = value.cursor || value.to;
+    var name = value.name ||value.value;
+    test(name,value)
+  });
+
+  function deepCompare(a, b) {
+    if (a === b) return true;
+    if (!(a && typeof a === "object") ||
+        !(b && typeof b === "object")) return false;
+    var array = a instanceof Array
+    if ((b instanceof Array) !== array) return false;
+    if (array) {
+      if (a.length !== b.length) return false;
+      for (var i = 0; i < a.length; i++) if (!deepCompare(a[i], b[i])) return false
+    } else {
+      for (var p in a) if (!(p in b) || !deepCompare(a[p], b[p])) return false;
+      for (var p in b) if (!(p in a)) return false
+    }
+    return true
+  }
+})();
