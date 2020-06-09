@@ -1,3 +1,454 @@
-// build time:Mon Jun 08 2020 22:22:00 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"),require("../css/css"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","../css/css"],e);else e(CodeMirror)})(function(e){"use strict";e.defineMode("sass",function(r){var t=e.mimeModes["text/css"];var n=t.propertyKeywords||{},i=t.colorKeywords||{},o=t.valueKeywords||{},f=t.fontProperties||{};function a(e){return new RegExp("^"+e.join("|"))}var u=["true","false","null","auto"];var s=new RegExp("^"+u.join("|"));var c=["\\(","\\)","=",">","<","==",">=","<=","\\+","-","\\!=","/","\\*","%","and","or","not",";","\\{","\\}",":"];var l=a(c);var p=/^::?[a-zA-Z_][\w\-]*/;var h;function m(e){return!e.peek()||e.match(/\s+$/,false)}function d(e,r){var t=e.peek();if(t===")"){e.next();r.tokenizer=z;return"operator"}else if(t==="("){e.next();e.eatSpace();return"operator"}else if(t==="'"||t==='"'){r.tokenizer=v(e.next());return"string"}else{r.tokenizer=v(")",false);return"string"}}function k(e,r){return function(t,n){if(t.sol()&&t.indentation()<=e){n.tokenizer=z;return z(t,n)}if(r&&t.skipTo("*/")){t.next();t.next();n.tokenizer=z}else{t.skipToEnd()}return"comment"}}function v(e,r){if(r==null){r=true}function t(n,i){var o=n.next();var f=n.peek();var a=n.string.charAt(n.pos-2);var u=o!=="\\"&&f===e||o===e&&a!=="\\";if(u){if(o!==e&&r){n.next()}if(m(n)){i.cursorHalf=0}i.tokenizer=z;return"string"}else if(o==="#"&&f==="{"){i.tokenizer=w(t);n.next();return"operator"}else{return"string"}}return t}function w(e){return function(r,t){if(r.peek()==="}"){r.next();t.tokenizer=e;return"operator"}else{return z(r,t)}}}function x(e){if(e.indentCount==0){e.indentCount++;var t=e.scopes[0].offset;var n=t+r.indentUnit;e.scopes.unshift({offset:n})}}function y(e){if(e.scopes.length==1)return;e.scopes.shift()}function z(e,r){var t=e.peek();if(e.match("/*")){r.tokenizer=k(e.indentation(),true);return r.tokenizer(e,r)}if(e.match("//")){r.tokenizer=k(e.indentation(),false);return r.tokenizer(e,r)}if(e.match("#{")){r.tokenizer=w(z);return"operator"}if(t==='"'||t==="'"){e.next();r.tokenizer=v(t);return"string"}if(!r.cursorHalf){if(t==="-"){if(e.match(/^-\w+-/)){return"meta"}}if(t==="."){e.next();if(e.match(/^[\w-]+/)){x(r);return"qualifier"}else if(e.peek()==="#"){x(r);return"tag"}}if(t==="#"){e.next();if(e.match(/^[\w-]+/)){x(r);return"builtin"}if(e.peek()==="#"){x(r);return"tag"}}if(t==="$"){e.next();e.eatWhile(/[\w-]/);return"variable-2"}if(e.match(/^-?[0-9\.]+/))return"number";if(e.match(/^(px|em|in)\b/))return"unit";if(e.match(s))return"keyword";if(e.match(/^url/)&&e.peek()==="("){r.tokenizer=d;return"atom"}if(t==="="){if(e.match(/^=[\w-]+/)){x(r);return"meta"}}if(t==="+"){if(e.match(/^\+[\w-]+/)){return"variable-3"}}if(t==="@"){if(e.match(/@extend/)){if(!e.match(/\s*[\w]/))y(r)}}if(e.match(/^@(else if|if|media|else|for|each|while|mixin|function)/)){x(r);return"def"}if(t==="@"){e.next();e.eatWhile(/[\w-]/);return"def"}if(e.eatWhile(/[\w-]/)){if(e.match(/ *: *[\w-\+\$#!\("']/,false)){h=e.current().toLowerCase();var a=r.prevProp+"-"+h;if(n.hasOwnProperty(a)){return"property"}else if(n.hasOwnProperty(h)){r.prevProp=h;return"property"}else if(f.hasOwnProperty(h)){return"property"}return"tag"}else if(e.match(/ *:/,false)){x(r);r.cursorHalf=1;r.prevProp=e.current().toLowerCase();return"property"}else if(e.match(/ *,/,false)){return"tag"}else{x(r);return"tag"}}if(t===":"){if(e.match(p)){return"variable-3"}e.next();r.cursorHalf=1;return"operator"}}else{if(t==="#"){e.next();if(e.match(/[0-9a-fA-F]{6}|[0-9a-fA-F]{3}/)){if(m(e)){r.cursorHalf=0}return"number"}}if(e.match(/^-?[0-9\.]+/)){if(m(e)){r.cursorHalf=0}return"number"}if(e.match(/^(px|em|in)\b/)){if(m(e)){r.cursorHalf=0}return"unit"}if(e.match(s)){if(m(e)){r.cursorHalf=0}return"keyword"}if(e.match(/^url/)&&e.peek()==="("){r.tokenizer=d;if(m(e)){r.cursorHalf=0}return"atom"}if(t==="$"){e.next();e.eatWhile(/[\w-]/);if(m(e)){r.cursorHalf=0}return"variable-2"}if(t==="!"){e.next();r.cursorHalf=0;return e.match(/^[\w]+/)?"keyword":"operator"}if(e.match(l)){if(m(e)){r.cursorHalf=0}return"operator"}if(e.eatWhile(/[\w-]/)){if(m(e)){r.cursorHalf=0}h=e.current().toLowerCase();if(o.hasOwnProperty(h)){return"atom"}else if(i.hasOwnProperty(h)){return"keyword"}else if(n.hasOwnProperty(h)){r.prevProp=e.current().toLowerCase();return"property"}else{return"tag"}}if(m(e)){r.cursorHalf=0;return null}}if(e.match(l))return"operator";e.next();return null}function g(e,t){if(e.sol())t.indentCount=0;var n=t.tokenizer(e,t);var i=e.current();if(i==="@return"||i==="}"){y(t)}if(n!==null){var o=e.pos-i.length;var f=o+r.indentUnit*t.indentCount;var a=[];for(var u=0;u<t.scopes.length;u++){var s=t.scopes[u];if(s.offset<=f)a.push(s)}t.scopes=a}return n}return{startState:function(){return{tokenizer:z,scopes:[{offset:0,type:"sass"}],indentCount:0,cursorHalf:0,definedVars:[],definedMixins:[]}},token:function(e,r){var t=g(e,r);r.lastToken={style:t,content:e.current()};return t},indent:function(e){return e.scopes[0].offset}}},"css");e.defineMIME("text/x-sass","sass")});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../css/css"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../css/css"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("sass", function(config) {
+  var cssMode = CodeMirror.mimeModes["text/css"];
+  var propertyKeywords = cssMode.propertyKeywords || {},
+      colorKeywords = cssMode.colorKeywords || {},
+      valueKeywords = cssMode.valueKeywords || {},
+      fontProperties = cssMode.fontProperties || {};
+
+  function tokenRegexp(words) {
+    return new RegExp("^" + words.join("|"));
+  }
+
+  var keywords = ["true", "false", "null", "auto"];
+  var keywordsRegexp = new RegExp("^" + keywords.join("|"));
+
+  var operators = ["\\(", "\\)", "=", ">", "<", "==", ">=", "<=", "\\+", "-",
+                   "\\!=", "/", "\\*", "%", "and", "or", "not", ";","\\{","\\}",":"];
+  var opRegexp = tokenRegexp(operators);
+
+  var pseudoElementsRegexp = /^::?[a-zA-Z_][\w\-]*/;
+
+  var word;
+
+  function isEndLine(stream) {
+    return !stream.peek() || stream.match(/\s+$/, false);
+  }
+
+  function urlTokens(stream, state) {
+    var ch = stream.peek();
+
+    if (ch === ")") {
+      stream.next();
+      state.tokenizer = tokenBase;
+      return "operator";
+    } else if (ch === "(") {
+      stream.next();
+      stream.eatSpace();
+
+      return "operator";
+    } else if (ch === "'" || ch === '"') {
+      state.tokenizer = buildStringTokenizer(stream.next());
+      return "string";
+    } else {
+      state.tokenizer = buildStringTokenizer(")", false);
+      return "string";
+    }
+  }
+  function comment(indentation, multiLine) {
+    return function(stream, state) {
+      if (stream.sol() && stream.indentation() <= indentation) {
+        state.tokenizer = tokenBase;
+        return tokenBase(stream, state);
+      }
+
+      if (multiLine && stream.skipTo("*/")) {
+        stream.next();
+        stream.next();
+        state.tokenizer = tokenBase;
+      } else {
+        stream.skipToEnd();
+      }
+
+      return "comment";
+    };
+  }
+
+  function buildStringTokenizer(quote, greedy) {
+    if (greedy == null) { greedy = true; }
+
+    function stringTokenizer(stream, state) {
+      var nextChar = stream.next();
+      var peekChar = stream.peek();
+      var previousChar = stream.string.charAt(stream.pos-2);
+
+      var endingString = ((nextChar !== "\\" && peekChar === quote) || (nextChar === quote && previousChar !== "\\"));
+
+      if (endingString) {
+        if (nextChar !== quote && greedy) { stream.next(); }
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        state.tokenizer = tokenBase;
+        return "string";
+      } else if (nextChar === "#" && peekChar === "{") {
+        state.tokenizer = buildInterpolationTokenizer(stringTokenizer);
+        stream.next();
+        return "operator";
+      } else {
+        return "string";
+      }
+    }
+
+    return stringTokenizer;
+  }
+
+  function buildInterpolationTokenizer(currentTokenizer) {
+    return function(stream, state) {
+      if (stream.peek() === "}") {
+        stream.next();
+        state.tokenizer = currentTokenizer;
+        return "operator";
+      } else {
+        return tokenBase(stream, state);
+      }
+    };
+  }
+
+  function indent(state) {
+    if (state.indentCount == 0) {
+      state.indentCount++;
+      var lastScopeOffset = state.scopes[0].offset;
+      var currentOffset = lastScopeOffset + config.indentUnit;
+      state.scopes.unshift({ offset:currentOffset });
+    }
+  }
+
+  function dedent(state) {
+    if (state.scopes.length == 1) return;
+
+    state.scopes.shift();
+  }
+
+  function tokenBase(stream, state) {
+    var ch = stream.peek();
+
+    // Comment
+    if (stream.match("/*")) {
+      state.tokenizer = comment(stream.indentation(), true);
+      return state.tokenizer(stream, state);
+    }
+    if (stream.match("//")) {
+      state.tokenizer = comment(stream.indentation(), false);
+      return state.tokenizer(stream, state);
+    }
+
+    // Interpolation
+    if (stream.match("#{")) {
+      state.tokenizer = buildInterpolationTokenizer(tokenBase);
+      return "operator";
+    }
+
+    // Strings
+    if (ch === '"' || ch === "'") {
+      stream.next();
+      state.tokenizer = buildStringTokenizer(ch);
+      return "string";
+    }
+
+    if(!state.cursorHalf){// state.cursorHalf === 0
+    // first half i.e. before : for key-value pairs
+    // including selectors
+
+      if (ch === "-") {
+        if (stream.match(/^-\w+-/)) {
+          return "meta";
+        }
+      }
+
+      if (ch === ".") {
+        stream.next();
+        if (stream.match(/^[\w-]+/)) {
+          indent(state);
+          return "qualifier";
+        } else if (stream.peek() === "#") {
+          indent(state);
+          return "tag";
+        }
+      }
+
+      if (ch === "#") {
+        stream.next();
+        // ID selectors
+        if (stream.match(/^[\w-]+/)) {
+          indent(state);
+          return "builtin";
+        }
+        if (stream.peek() === "#") {
+          indent(state);
+          return "tag";
+        }
+      }
+
+      // Variables
+      if (ch === "$") {
+        stream.next();
+        stream.eatWhile(/[\w-]/);
+        return "variable-2";
+      }
+
+      // Numbers
+      if (stream.match(/^-?[0-9\.]+/))
+        return "number";
+
+      // Units
+      if (stream.match(/^(px|em|in)\b/))
+        return "unit";
+
+      if (stream.match(keywordsRegexp))
+        return "keyword";
+
+      if (stream.match(/^url/) && stream.peek() === "(") {
+        state.tokenizer = urlTokens;
+        return "atom";
+      }
+
+      if (ch === "=") {
+        // Match shortcut mixin definition
+        if (stream.match(/^=[\w-]+/)) {
+          indent(state);
+          return "meta";
+        }
+      }
+
+      if (ch === "+") {
+        // Match shortcut mixin definition
+        if (stream.match(/^\+[\w-]+/)){
+          return "variable-3";
+        }
+      }
+
+      if(ch === "@"){
+        if(stream.match(/@extend/)){
+          if(!stream.match(/\s*[\w]/))
+            dedent(state);
+        }
+      }
+
+
+      // Indent Directives
+      if (stream.match(/^@(else if|if|media|else|for|each|while|mixin|function)/)) {
+        indent(state);
+        return "def";
+      }
+
+      // Other Directives
+      if (ch === "@") {
+        stream.next();
+        stream.eatWhile(/[\w-]/);
+        return "def";
+      }
+
+      if (stream.eatWhile(/[\w-]/)){
+        if(stream.match(/ *: *[\w-\+\$#!\("']/,false)){
+          word = stream.current().toLowerCase();
+          var prop = state.prevProp + "-" + word;
+          if (propertyKeywords.hasOwnProperty(prop)) {
+            return "property";
+          } else if (propertyKeywords.hasOwnProperty(word)) {
+            state.prevProp = word;
+            return "property";
+          } else if (fontProperties.hasOwnProperty(word)) {
+            return "property";
+          }
+          return "tag";
+        }
+        else if(stream.match(/ *:/,false)){
+          indent(state);
+          state.cursorHalf = 1;
+          state.prevProp = stream.current().toLowerCase();
+          return "property";
+        }
+        else if(stream.match(/ *,/,false)){
+          return "tag";
+        }
+        else{
+          indent(state);
+          return "tag";
+        }
+      }
+
+      if(ch === ":"){
+        if (stream.match(pseudoElementsRegexp)){ // could be a pseudo-element
+          return "variable-3";
+        }
+        stream.next();
+        state.cursorHalf=1;
+        return "operator";
+      }
+
+    } // cursorHalf===0 ends here
+    else{
+
+      if (ch === "#") {
+        stream.next();
+        // Hex numbers
+        if (stream.match(/[0-9a-fA-F]{6}|[0-9a-fA-F]{3}/)){
+          if (isEndLine(stream)) {
+            state.cursorHalf = 0;
+          }
+          return "number";
+        }
+      }
+
+      // Numbers
+      if (stream.match(/^-?[0-9\.]+/)){
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "number";
+      }
+
+      // Units
+      if (stream.match(/^(px|em|in)\b/)){
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "unit";
+      }
+
+      if (stream.match(keywordsRegexp)){
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "keyword";
+      }
+
+      if (stream.match(/^url/) && stream.peek() === "(") {
+        state.tokenizer = urlTokens;
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "atom";
+      }
+
+      // Variables
+      if (ch === "$") {
+        stream.next();
+        stream.eatWhile(/[\w-]/);
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "variable-2";
+      }
+
+      // bang character for !important, !default, etc.
+      if (ch === "!") {
+        stream.next();
+        state.cursorHalf = 0;
+        return stream.match(/^[\w]+/) ? "keyword": "operator";
+      }
+
+      if (stream.match(opRegexp)){
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        return "operator";
+      }
+
+      // attributes
+      if (stream.eatWhile(/[\w-]/)) {
+        if (isEndLine(stream)) {
+          state.cursorHalf = 0;
+        }
+        word = stream.current().toLowerCase();
+        if (valueKeywords.hasOwnProperty(word)) {
+          return "atom";
+        } else if (colorKeywords.hasOwnProperty(word)) {
+          return "keyword";
+        } else if (propertyKeywords.hasOwnProperty(word)) {
+          state.prevProp = stream.current().toLowerCase();
+          return "property";
+        } else {
+          return "tag";
+        }
+      }
+
+      //stream.eatSpace();
+      if (isEndLine(stream)) {
+        state.cursorHalf = 0;
+        return null;
+      }
+
+    } // else ends here
+
+    if (stream.match(opRegexp))
+      return "operator";
+
+    // If we haven't returned by now, we move 1 character
+    // and return an error
+    stream.next();
+    return null;
+  }
+
+  function tokenLexer(stream, state) {
+    if (stream.sol()) state.indentCount = 0;
+    var style = state.tokenizer(stream, state);
+    var current = stream.current();
+
+    if (current === "@return" || current === "}"){
+      dedent(state);
+    }
+
+    if (style !== null) {
+      var startOfToken = stream.pos - current.length;
+
+      var withCurrentIndent = startOfToken + (config.indentUnit * state.indentCount);
+
+      var newScopes = [];
+
+      for (var i = 0; i < state.scopes.length; i++) {
+        var scope = state.scopes[i];
+
+        if (scope.offset <= withCurrentIndent)
+          newScopes.push(scope);
+      }
+
+      state.scopes = newScopes;
+    }
+
+
+    return style;
+  }
+
+  return {
+    startState: function() {
+      return {
+        tokenizer: tokenBase,
+        scopes: [{offset: 0, type: "sass"}],
+        indentCount: 0,
+        cursorHalf: 0,  // cursor half tells us if cursor lies after (1)
+                        // or before (0) colon (well... more or less)
+        definedVars: [],
+        definedMixins: []
+      };
+    },
+    token: function(stream, state) {
+      var style = tokenLexer(stream, state);
+
+      state.lastToken = { style: style, content: stream.current() };
+
+      return style;
+    },
+
+    indent: function(state) {
+      return state.scopes[0].offset;
+    }
+  };
+}, "css");
+
+CodeMirror.defineMIME("text/x-sass", "sass");
+
+});

@@ -1,3 +1,97 @@
-// build time:Mon Jun 08 2020 22:21:55 GMT+0800 (Central Standard Time)
-(function(t){if(typeof exports=="object"&&typeof module=="object")t(require("../../lib/codemirror"),require("./searchcursor"),require("../scroll/annotatescrollbar"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","./searchcursor","../scroll/annotatescrollbar"],t);else t(CodeMirror)})(function(t){"use strict";t.defineExtension("showMatchesOnScrollbar",function(t,i,o){if(typeof o=="string")o={className:o};if(!o)o={};return new e(this,t,i,o)});function e(t,e,i,o){this.cm=t;this.options=o;var a={listenForChanges:false};for(var s in o)a[s]=o[s];if(!a.className)a.className="CodeMirror-search-match";this.annotation=t.annotateScrollbar(a);this.query=e;this.caseFold=i;this.gap={from:t.firstLine(),to:t.lastLine()+1};this.matches=[];this.update=null;this.findMatches();this.annotation.update(this.matches);var r=this;t.on("change",this.changeHandler=function(t,e){r.onChange(e)})}var i=1e3;e.prototype.findMatches=function(){if(!this.gap)return;for(var e=0;e<this.matches.length;e++){var o=this.matches[e];if(o.from.line>=this.gap.to)break;if(o.to.line>=this.gap.from)this.matches.splice(e--,1)}var a=this.cm.getSearchCursor(this.query,t.Pos(this.gap.from,0),{caseFold:this.caseFold,multiline:this.options.multiline});var s=this.options&&this.options.maxMatches||i;while(a.findNext()){var o={from:a.from(),to:a.to()};if(o.from.line>=this.gap.to)break;this.matches.splice(e++,0,o);if(this.matches.length>s)break}this.gap=null};function o(t,e,i){if(t<=e)return t;return Math.max(e,t+i)}e.prototype.onChange=function(e){var i=e.from.line;var a=t.changeEnd(e).line;var s=a-e.to.line;if(this.gap){this.gap.from=Math.min(o(this.gap.from,i,s),e.from.line);this.gap.to=Math.max(o(this.gap.to,i,s),e.from.line)}else{this.gap={from:e.from.line,to:a+1}}if(s)for(var r=0;r<this.matches.length;r++){var n=this.matches[r];var h=o(n.from.line,i,s);if(h!=n.from.line)n.from=t.Pos(h,n.from.ch);var c=o(n.to.line,i,s);if(c!=n.to.line)n.to=t.Pos(c,n.to.ch)}clearTimeout(this.update);var f=this;this.update=setTimeout(function(){f.updateAfterChange()},250)};e.prototype.updateAfterChange=function(){this.findMatches();this.annotation.update(this.matches)};e.prototype.clear=function(){this.cm.off("change",this.changeHandler);this.annotation.clear()}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("./searchcursor"), require("../scroll/annotatescrollbar"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "./searchcursor", "../scroll/annotatescrollbar"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineExtension("showMatchesOnScrollbar", function(query, caseFold, options) {
+    if (typeof options == "string") options = {className: options};
+    if (!options) options = {};
+    return new SearchAnnotation(this, query, caseFold, options);
+  });
+
+  function SearchAnnotation(cm, query, caseFold, options) {
+    this.cm = cm;
+    this.options = options;
+    var annotateOptions = {listenForChanges: false};
+    for (var prop in options) annotateOptions[prop] = options[prop];
+    if (!annotateOptions.className) annotateOptions.className = "CodeMirror-search-match";
+    this.annotation = cm.annotateScrollbar(annotateOptions);
+    this.query = query;
+    this.caseFold = caseFold;
+    this.gap = {from: cm.firstLine(), to: cm.lastLine() + 1};
+    this.matches = [];
+    this.update = null;
+
+    this.findMatches();
+    this.annotation.update(this.matches);
+
+    var self = this;
+    cm.on("change", this.changeHandler = function(_cm, change) { self.onChange(change); });
+  }
+
+  var MAX_MATCHES = 1000;
+
+  SearchAnnotation.prototype.findMatches = function() {
+    if (!this.gap) return;
+    for (var i = 0; i < this.matches.length; i++) {
+      var match = this.matches[i];
+      if (match.from.line >= this.gap.to) break;
+      if (match.to.line >= this.gap.from) this.matches.splice(i--, 1);
+    }
+    var cursor = this.cm.getSearchCursor(this.query, CodeMirror.Pos(this.gap.from, 0), {caseFold: this.caseFold, multiline: this.options.multiline});
+    var maxMatches = this.options && this.options.maxMatches || MAX_MATCHES;
+    while (cursor.findNext()) {
+      var match = {from: cursor.from(), to: cursor.to()};
+      if (match.from.line >= this.gap.to) break;
+      this.matches.splice(i++, 0, match);
+      if (this.matches.length > maxMatches) break;
+    }
+    this.gap = null;
+  };
+
+  function offsetLine(line, changeStart, sizeChange) {
+    if (line <= changeStart) return line;
+    return Math.max(changeStart, line + sizeChange);
+  }
+
+  SearchAnnotation.prototype.onChange = function(change) {
+    var startLine = change.from.line;
+    var endLine = CodeMirror.changeEnd(change).line;
+    var sizeChange = endLine - change.to.line;
+    if (this.gap) {
+      this.gap.from = Math.min(offsetLine(this.gap.from, startLine, sizeChange), change.from.line);
+      this.gap.to = Math.max(offsetLine(this.gap.to, startLine, sizeChange), change.from.line);
+    } else {
+      this.gap = {from: change.from.line, to: endLine + 1};
+    }
+
+    if (sizeChange) for (var i = 0; i < this.matches.length; i++) {
+      var match = this.matches[i];
+      var newFrom = offsetLine(match.from.line, startLine, sizeChange);
+      if (newFrom != match.from.line) match.from = CodeMirror.Pos(newFrom, match.from.ch);
+      var newTo = offsetLine(match.to.line, startLine, sizeChange);
+      if (newTo != match.to.line) match.to = CodeMirror.Pos(newTo, match.to.ch);
+    }
+    clearTimeout(this.update);
+    var self = this;
+    this.update = setTimeout(function() { self.updateAfterChange(); }, 250);
+  };
+
+  SearchAnnotation.prototype.updateAfterChange = function() {
+    this.findMatches();
+    this.annotation.update(this.matches);
+  };
+
+  SearchAnnotation.prototype.clear = function() {
+    this.cm.off("change", this.changeHandler);
+    this.annotation.clear();
+  };
+});

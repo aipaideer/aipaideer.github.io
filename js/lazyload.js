@@ -1,3 +1,58 @@
-// build time:Mon Jun 08 2020 22:21:49 GMT+0800 (Central Standard Time)
-!function(t,n){var e=Array.prototype.slice.call(n.querySelectorAll("img[srcset]"));function r(e){var r=e.getBoundingClientRect();var i=t.innerHeight||n.documentElement.clientHeight;return r.top>=0&&r.left>=0&&r.top<=i*3}function i(t,n){var e=new Image;var r=t.getAttribute("src");e.onload=function(){t.srcset=r;n&&n()};e.srcset=r}function o(){for(var n=0;n<e.length;n++){if(r(e[n])){(function(t){var n=e[t];i(n,function(){e=e.filter(function(t){return n!==t})})})(n)}}if(e.length===0){t.removeEventListener("scroll",l)}}function c(t,n){clearTimeout(t.tId);t.tId=setTimeout(function(){t.call(n)},100)}var l=function(){c(o,t)};o();t.addEventListener("scroll",l)}(window,document);
-//rebuild by neat 
+// eslint-disable-next-line no-unused-expressions
+!(function(window, document) {
+  var images = Array.prototype.slice.call(document.querySelectorAll('img[srcset]'));
+
+  function elementInViewport(el) {
+    var rect = el.getBoundingClientRect();
+    var height = window.innerHeight || document.documentElement.clientHeight;
+    return (
+      rect.top >= 0
+      && rect.left >= 0
+      && rect.top <= height * 3
+    );
+  }
+
+  function loadImage(el, fn) {
+    var img = new Image();
+    var src = el.getAttribute('src');
+    img.onload = function() {
+      el.srcset = src;
+      fn && fn();
+    };
+    img.srcset = src;
+  }
+
+  function processImages() {
+    for (var i = 0; i < images.length; i++) {
+      if (elementInViewport(images[i])) {
+        // eslint-disable-next-line no-loop-func
+        (function(index) {
+          var loadingImage = images[index];
+          loadImage(loadingImage, function() {
+            images = images.filter(function(t) {
+              return loadingImage !== t;
+            });
+          });
+        })(i);
+      }
+    }
+    if (images.length === 0) {
+      window.removeEventListener('scroll', imageLazyLoader);
+    }
+  }
+
+  function throttle(method, context) {
+    clearTimeout(method.tId);
+    method.tId = setTimeout(function() {
+      method.call(context);
+    }, 100);
+  }
+
+  var imageLazyLoader = function() {
+    throttle(processImages, window);
+  };
+
+  processImages();
+
+  window.addEventListener('scroll', imageLazyLoader);
+})(window, document);

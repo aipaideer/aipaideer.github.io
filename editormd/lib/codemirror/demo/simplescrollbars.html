@@ -1,4 +1,32 @@
-<!-- build time:Mon Jun 08 2020 22:22:08 GMT+0800 (Central Standard Time) --><!doctype html><title>CodeMirror: Simple Scrollbar Demo</title><meta charset="utf-8"><link rel="stylesheet" href="../doc/docs.css"><link rel="stylesheet" href="../lib/codemirror.css"><link rel="stylesheet" href="../addon/scroll/simplescrollbars.css"><script src="../lib/codemirror.js"></script><script src="../mode/markdown/markdown.js"></script><script src="../mode/xml/xml.js"></script><script src="../addon/scroll/simplescrollbars.js"></script><div id="nav"><a href="https://codemirror.net" target="_blank" rel="noopener"><h1>CodeMirror</h1><img id="logo" src="../doc/logo.png" srcset="/img/loading.gif"></a><ul><li><a href="../index.html">Home</a></li><li><a href="../doc/manual.html">Manual</a></li><li><a href="https://github.com/codemirror/codemirror" target="_blank" rel="noopener">Code</a></li></ul><ul><li><a class="active" href="#">Simple Scrollbar</a></li></ul></div><article><h2>Simple Scrollbar Demo</h2><form><textarea id="code" name="code"># Custom Scrollbars
+<!doctype html>
+
+<title>CodeMirror: Simple Scrollbar Demo</title>
+<meta charset="utf-8"/>
+<link rel=stylesheet href="../doc/docs.css">
+
+<link rel="stylesheet" href="../lib/codemirror.css">
+<link rel="stylesheet" href="../addon/scroll/simplescrollbars.css">
+<script src="../lib/codemirror.js"></script>
+<script src="../mode/markdown/markdown.js"></script>
+<script src="../mode/xml/xml.js"></script>
+<script src="../addon/scroll/simplescrollbars.js"></script>
+
+<div id=nav>
+  <a href="https://codemirror.net" target="_blank" rel="noopener"><h1>CodeMirror</h1><img id=logo src="../doc/logo.png" srcset="/img/loading.gif"></a>
+
+  <ul>
+    <li><a href="../index.html">Home</a>
+    <li><a href="../doc/manual.html">Manual</a>
+    <li><a href="https://github.com/codemirror/codemirror" target="_blank" rel="noopener">Code</a>
+  </ul>
+  <ul>
+    <li><a class=active href="#">Simple Scrollbar</a>
+  </ul>
+</div>
+
+<article>
+<h2>Simple Scrollbar Demo</h2>
+<form><textarea id="code" name="code"># Custom Scrollbars
 
 This is a piece of text that creates scrollbars
 
@@ -37,4 +65,18 @@ augue, adipiscing donec ipsum erat nam pellentesque convallis, vestibulum vestib
 curabitur aute aptent. Ultrices orci wisi dui ipsum praesent, pharetra felis eu quis. Est fringilla etiam,
 maxime sem dapibus et eget, mi enim dignissim nec pretium, augue vehicula, volutpat proin. Et occaecati
 lobortis viverra, cum in sed, vivamus tellus. Libero at malesuada est vivamus leo tortor.
-</textarea></form><p>The <a href="../doc/manual.html#addon_simplescrollbars"><code>simplescrollbars</code></a> addon defines two styles of non-native scrollbars: <a href="javascript:editor.setOption('scrollbarStyle', 'simple')"><code>"simple"</code></a> and <a href="javascript:editor.setOption('scrollbarStyle', 'overlay')"><code>"overlay"</code></a> (click to try), which can be passed to the <a href="../doc/manual.html#option_scrollbarStyle"><code>scrollbarStyle</code></a> option. These implement the scrollbar using DOM elements, allowing more control over its <a href="../addon/scroll/simplescrollbars.css">appearance</a>.</p><script>var editor=CodeMirror.fromTextArea(document.getElementById("code"),{lineNumbers:!0,scrollbarStyle:"simple"})</script></article><!-- rebuild by neat -->
+</textarea></form>
+
+<p>The <a href="../doc/manual.html#addon_simplescrollbars"><code>simplescrollbars</code></a> addon defines two
+styles of non-native scrollbars: <a href="javascript:editor.setOption('scrollbarStyle', 'simple')"><code>"simple"</code></a> and <a href="javascript:editor.setOption('scrollbarStyle', 'overlay')"><code>"overlay"</code></a> (click to try), which can be passed to
+the <a href="../doc/manual.html#option_scrollbarStyle"><code>scrollbarStyle</code></a> option. These implement
+the scrollbar using DOM elements, allowing more control over
+its <a href="../addon/scroll/simplescrollbars.css">appearance</a>.</p>
+
+  <script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: true,
+      scrollbarStyle: "simple"
+    });
+  </script>
+</article>

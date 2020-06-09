@@ -1,3 +1,59 @@
-// build time:Mon Jun 08 2020 22:21:53 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.registerGlobalHelper("fold","comment",function(e){return e.blockCommentStart&&e.blockCommentEnd},function(t,n){var r=t.getModeAt(n),o=r.blockCommentStart,i=r.blockCommentEnd;if(!o||!i)return;var f=n.line,l=t.getLine(f);var c;for(var m=n.ch,a=0;;){var s=m<=0?-1:l.lastIndexOf(o,m-1);if(s==-1){if(a==1)return;a=1;m=l.length;continue}if(a==1&&s<n.ch)return;if(/comment/.test(t.getTokenTypeAt(e.Pos(f,s+1)))&&(s==0||l.slice(s-i.length,s)==i||!/comment/.test(t.getTokenTypeAt(e.Pos(f,s))))){c=s+o.length;break}m=s-1}var u=1,d=t.lastLine(),b,g;e:for(var h=f;h<=d;++h){var k=t.getLine(h),v=h==f?c:0;for(;;){var p=k.indexOf(o,v),y=k.indexOf(i,v);if(p<0)p=k.length;if(y<0)y=k.length;v=Math.min(p,y);if(v==k.length)break;if(v==p)++u;else if(!--u){b=h;g=v;break e}++v}}if(b==null||f==b&&g==c)return;return{from:e.Pos(f,c),to:e.Pos(b,g)}})});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.registerGlobalHelper("fold", "comment", function(mode) {
+  return mode.blockCommentStart && mode.blockCommentEnd;
+}, function(cm, start) {
+  var mode = cm.getModeAt(start), startToken = mode.blockCommentStart, endToken = mode.blockCommentEnd;
+  if (!startToken || !endToken) return;
+  var line = start.line, lineText = cm.getLine(line);
+
+  var startCh;
+  for (var at = start.ch, pass = 0;;) {
+    var found = at <= 0 ? -1 : lineText.lastIndexOf(startToken, at - 1);
+    if (found == -1) {
+      if (pass == 1) return;
+      pass = 1;
+      at = lineText.length;
+      continue;
+    }
+    if (pass == 1 && found < start.ch) return;
+    if (/comment/.test(cm.getTokenTypeAt(CodeMirror.Pos(line, found + 1))) &&
+        (found == 0 || lineText.slice(found - endToken.length, found) == endToken ||
+         !/comment/.test(cm.getTokenTypeAt(CodeMirror.Pos(line, found))))) {
+      startCh = found + startToken.length;
+      break;
+    }
+    at = found - 1;
+  }
+
+  var depth = 1, lastLine = cm.lastLine(), end, endCh;
+  outer: for (var i = line; i <= lastLine; ++i) {
+    var text = cm.getLine(i), pos = i == line ? startCh : 0;
+    for (;;) {
+      var nextOpen = text.indexOf(startToken, pos), nextClose = text.indexOf(endToken, pos);
+      if (nextOpen < 0) nextOpen = text.length;
+      if (nextClose < 0) nextClose = text.length;
+      pos = Math.min(nextOpen, nextClose);
+      if (pos == text.length) break;
+      if (pos == nextOpen) ++depth;
+      else if (!--depth) { end = i; endCh = pos; break outer; }
+      ++pos;
+    }
+  }
+  if (end == null || line == end && endCh == startCh) return;
+  return {from: CodeMirror.Pos(line, startCh),
+          to: CodeMirror.Pos(end, endCh)};
+});
+
+});

@@ -1,3 +1,163 @@
-// build time:Mon Jun 08 2020 22:21:53 GMT+0800 (Central Standard Time)
-(function(t){if(typeof exports=="object"&&typeof module=="object")t(require("../../lib/codemirror"),require("./foldcode"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","./foldcode"],t);else t(CodeMirror)})(function(t){"use strict";t.defineOption("foldGutter",false,function(e,n,i){if(i&&i!=t.Init){e.clearGutter(e.state.foldGutter.options.gutter);e.state.foldGutter=null;e.off("gutterClick",d);e.off("changes",l);e.off("viewportChange",c);e.off("fold",s);e.off("unfold",s);e.off("swapDoc",l)}if(n){e.state.foldGutter=new o(r(n));u(e);e.on("gutterClick",d);e.on("changes",l);e.on("viewportChange",c);e.on("fold",s);e.on("unfold",s);e.on("swapDoc",l)}});var e=t.Pos;function o(t){this.options=t;this.from=this.to=0}function r(t){if(t===true)t={};if(t.gutter==null)t.gutter="CodeMirror-foldgutter";if(t.indicatorOpen==null)t.indicatorOpen="CodeMirror-foldgutter-open";if(t.indicatorFolded==null)t.indicatorFolded="CodeMirror-foldgutter-folded";return t}function n(t,o){var r=t.findMarks(e(o,0),e(o+1,0));for(var n=0;n<r.length;++n){if(r[n].__isFold){var i=r[n].find(-1);if(i&&i.line===o)return r[n]}}}function i(t){if(typeof t=="string"){var e=document.createElement("div");e.className=t+" CodeMirror-guttermarker-subtle";return e}else{return t.cloneNode(true)}}function f(t,o,r){var f=t.state.foldGutter.options,u=o-1;var d=t.foldOption(f,"minFoldSize");var l=t.foldOption(f,"rangeFinder");var c=typeof f.indicatorFolded=="string"&&a(f.indicatorFolded);var s=typeof f.indicatorOpen=="string"&&a(f.indicatorOpen);t.eachLine(o,r,function(o){++u;var r=null;var a=o.gutterMarkers;if(a)a=a[f.gutter];if(n(t,u)){if(c&&a&&c.test(a.className))return;r=i(f.indicatorFolded)}else{var p=e(u,0);var m=l&&l(t,p);if(m&&m.to.line-m.from.line>=d){if(s&&a&&s.test(a.className))return;r=i(f.indicatorOpen)}}if(!r&&!a)return;t.setGutterMarker(o,f.gutter,r)})}function a(t){return new RegExp("(^|\\s)"+t+"(?:$|\\s)\\s*")}function u(t){var e=t.getViewport(),o=t.state.foldGutter;if(!o)return;t.operation(function(){f(t,e.from,e.to)});o.from=e.from;o.to=e.to}function d(t,o,r){var i=t.state.foldGutter;if(!i)return;var f=i.options;if(r!=f.gutter)return;var a=n(t,o);if(a)a.clear();else t.foldCode(e(o,0),f)}function l(t){var e=t.state.foldGutter;if(!e)return;var o=e.options;e.from=e.to=0;clearTimeout(e.changeUpdate);e.changeUpdate=setTimeout(function(){u(t)},o.foldOnChangeTimeSpan||600)}function c(t){var e=t.state.foldGutter;if(!e)return;var o=e.options;clearTimeout(e.changeUpdate);e.changeUpdate=setTimeout(function(){var o=t.getViewport();if(e.from==e.to||o.from-e.to>20||e.from-o.to>20){u(t)}else{t.operation(function(){if(o.from<e.from){f(t,o.from,e.from);e.from=o.from}if(o.to>e.to){f(t,e.to,o.to);e.to=o.to}})}},o.updateViewportTimeSpan||400)}function s(t,e){var o=t.state.foldGutter;if(!o)return;var r=e.line;if(r>=o.from&&r<o.to)f(t,r,r+1)}});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("./foldcode"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "./foldcode"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineOption("foldGutter", false, function(cm, val, old) {
+    if (old && old != CodeMirror.Init) {
+      cm.clearGutter(cm.state.foldGutter.options.gutter);
+      cm.state.foldGutter = null;
+      cm.off("gutterClick", onGutterClick);
+      cm.off("changes", onChange);
+      cm.off("viewportChange", onViewportChange);
+      cm.off("fold", onFold);
+      cm.off("unfold", onFold);
+      cm.off("swapDoc", onChange);
+    }
+    if (val) {
+      cm.state.foldGutter = new State(parseOptions(val));
+      updateInViewport(cm);
+      cm.on("gutterClick", onGutterClick);
+      cm.on("changes", onChange);
+      cm.on("viewportChange", onViewportChange);
+      cm.on("fold", onFold);
+      cm.on("unfold", onFold);
+      cm.on("swapDoc", onChange);
+    }
+  });
+
+  var Pos = CodeMirror.Pos;
+
+  function State(options) {
+    this.options = options;
+    this.from = this.to = 0;
+  }
+
+  function parseOptions(opts) {
+    if (opts === true) opts = {};
+    if (opts.gutter == null) opts.gutter = "CodeMirror-foldgutter";
+    if (opts.indicatorOpen == null) opts.indicatorOpen = "CodeMirror-foldgutter-open";
+    if (opts.indicatorFolded == null) opts.indicatorFolded = "CodeMirror-foldgutter-folded";
+    return opts;
+  }
+
+  function isFolded(cm, line) {
+    var marks = cm.findMarks(Pos(line, 0), Pos(line + 1, 0));
+    for (var i = 0; i < marks.length; ++i) {
+      if (marks[i].__isFold) {
+        var fromPos = marks[i].find(-1);
+        if (fromPos && fromPos.line === line)
+          return marks[i];
+      }
+    }
+  }
+
+  function marker(spec) {
+    if (typeof spec == "string") {
+      var elt = document.createElement("div");
+      elt.className = spec + " CodeMirror-guttermarker-subtle";
+      return elt;
+    } else {
+      return spec.cloneNode(true);
+    }
+  }
+
+  function updateFoldInfo(cm, from, to) {
+    var opts = cm.state.foldGutter.options, cur = from - 1;
+    var minSize = cm.foldOption(opts, "minFoldSize");
+    var func = cm.foldOption(opts, "rangeFinder");
+    // we can reuse the built-in indicator element if its className matches the new state
+    var clsFolded = typeof opts.indicatorFolded == "string" && classTest(opts.indicatorFolded);
+    var clsOpen = typeof opts.indicatorOpen == "string" && classTest(opts.indicatorOpen);
+    cm.eachLine(from, to, function(line) {
+      ++cur;
+      var mark = null;
+      var old = line.gutterMarkers;
+      if (old) old = old[opts.gutter];
+      if (isFolded(cm, cur)) {
+        if (clsFolded && old && clsFolded.test(old.className)) return;
+        mark = marker(opts.indicatorFolded);
+      } else {
+        var pos = Pos(cur, 0);
+        var range = func && func(cm, pos);
+        if (range && range.to.line - range.from.line >= minSize) {
+          if (clsOpen && old && clsOpen.test(old.className)) return;
+          mark = marker(opts.indicatorOpen);
+        }
+      }
+      if (!mark && !old) return;
+      cm.setGutterMarker(line, opts.gutter, mark);
+    });
+  }
+
+  // copied from CodeMirror/src/util/dom.js
+  function classTest(cls) { return new RegExp("(^|\\s)" + cls + "(?:$|\\s)\\s*") }
+
+  function updateInViewport(cm) {
+    var vp = cm.getViewport(), state = cm.state.foldGutter;
+    if (!state) return;
+    cm.operation(function() {
+      updateFoldInfo(cm, vp.from, vp.to);
+    });
+    state.from = vp.from; state.to = vp.to;
+  }
+
+  function onGutterClick(cm, line, gutter) {
+    var state = cm.state.foldGutter;
+    if (!state) return;
+    var opts = state.options;
+    if (gutter != opts.gutter) return;
+    var folded = isFolded(cm, line);
+    if (folded) folded.clear();
+    else cm.foldCode(Pos(line, 0), opts);
+  }
+
+  function onChange(cm) {
+    var state = cm.state.foldGutter;
+    if (!state) return;
+    var opts = state.options;
+    state.from = state.to = 0;
+    clearTimeout(state.changeUpdate);
+    state.changeUpdate = setTimeout(function() { updateInViewport(cm); }, opts.foldOnChangeTimeSpan || 600);
+  }
+
+  function onViewportChange(cm) {
+    var state = cm.state.foldGutter;
+    if (!state) return;
+    var opts = state.options;
+    clearTimeout(state.changeUpdate);
+    state.changeUpdate = setTimeout(function() {
+      var vp = cm.getViewport();
+      if (state.from == state.to || vp.from - state.to > 20 || state.from - vp.to > 20) {
+        updateInViewport(cm);
+      } else {
+        cm.operation(function() {
+          if (vp.from < state.from) {
+            updateFoldInfo(cm, vp.from, state.from);
+            state.from = vp.from;
+          }
+          if (vp.to > state.to) {
+            updateFoldInfo(cm, state.to, vp.to);
+            state.to = vp.to;
+          }
+        });
+      }
+    }, opts.updateViewportTimeSpan || 400);
+  }
+
+  function onFold(cm, from) {
+    var state = cm.state.foldGutter;
+    if (!state) return;
+    var line = from.line;
+    if (line >= state.from && line < state.to)
+      updateFoldInfo(cm, line, line + 1);
+  }
+});

@@ -1,3 +1,163 @@
-// build time:Mon Jun 08 2020 22:21:53 GMT+0800 (Central Standard Time)
-(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){function o(o,n,t){var i=o.getWrapperElement();var r;r=i.appendChild(document.createElement("div"));if(t)r.className="CodeMirror-dialog CodeMirror-dialog-bottom";else r.className="CodeMirror-dialog CodeMirror-dialog-top";if(typeof n=="string"){r.innerHTML=n}else{r.appendChild(n)}e.addClass(i,"dialog-opened");return r}function n(e,o){if(e.state.currentNotificationClose)e.state.currentNotificationClose();e.state.currentNotificationClose=o}e.defineExtension("openDialog",function(t,i,r){if(!r)r={};n(this,null);var f=o(this,t,r.bottom);var l=false,u=this;function a(o){if(typeof o=="string"){s.value=o}else{if(l)return;l=true;e.rmClass(f.parentNode,"dialog-opened");f.parentNode.removeChild(f);u.focus();if(r.onClose)r.onClose(f)}}var s=f.getElementsByTagName("input")[0],c;if(s){s.focus();if(r.value){s.value=r.value;if(r.selectValueOnOpen!==false){s.select()}}if(r.onInput)e.on(s,"input",function(e){r.onInput(e,s.value,a)});if(r.onKeyUp)e.on(s,"keyup",function(e){r.onKeyUp(e,s.value,a)});e.on(s,"keydown",function(o){if(r&&r.onKeyDown&&r.onKeyDown(o,s.value,a)){return}if(o.keyCode==27||r.closeOnEnter!==false&&o.keyCode==13){s.blur();e.e_stop(o);a()}if(o.keyCode==13)i(s.value,o)});if(r.closeOnBlur!==false)e.on(f,"focusout",function(e){if(e.relatedTarget!==null)a()})}else if(c=f.getElementsByTagName("button")[0]){e.on(c,"click",function(){a();u.focus()});if(r.closeOnBlur!==false)e.on(c,"blur",a);c.focus()}return a});e.defineExtension("openConfirm",function(t,i,r){n(this,null);var f=o(this,t,r&&r.bottom);var l=f.getElementsByTagName("button");var u=false,a=this,s=1;function c(){if(u)return;u=true;e.rmClass(f.parentNode,"dialog-opened");f.parentNode.removeChild(f);a.focus()}l[0].focus();for(var d=0;d<l.length;++d){var p=l[d];(function(o){e.on(p,"click",function(n){e.e_preventDefault(n);c();if(o)o(a)})})(i[d]);e.on(p,"blur",function(){--s;setTimeout(function(){if(s<=0)c()},200)});e.on(p,"focus",function(){++s})}});e.defineExtension("openNotification",function(t,i){n(this,a);var r=o(this,t,i&&i.bottom);var f=false,l;var u=i&&typeof i.duration!=="undefined"?i.duration:5e3;function a(){if(f)return;f=true;clearTimeout(l);e.rmClass(r.parentNode,"dialog-opened");r.parentNode.removeChild(r)}e.on(r,"click",function(o){e.e_preventDefault(o);a()});if(u)l=setTimeout(a,u);return a})});
-//rebuild by neat 
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+// Open simple dialogs on top of an editor. Relies on dialog.css.
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  function dialogDiv(cm, template, bottom) {
+    var wrap = cm.getWrapperElement();
+    var dialog;
+    dialog = wrap.appendChild(document.createElement("div"));
+    if (bottom)
+      dialog.className = "CodeMirror-dialog CodeMirror-dialog-bottom";
+    else
+      dialog.className = "CodeMirror-dialog CodeMirror-dialog-top";
+
+    if (typeof template == "string") {
+      dialog.innerHTML = template;
+    } else { // Assuming it's a detached DOM element.
+      dialog.appendChild(template);
+    }
+    CodeMirror.addClass(wrap, 'dialog-opened');
+    return dialog;
+  }
+
+  function closeNotification(cm, newVal) {
+    if (cm.state.currentNotificationClose)
+      cm.state.currentNotificationClose();
+    cm.state.currentNotificationClose = newVal;
+  }
+
+  CodeMirror.defineExtension("openDialog", function(template, callback, options) {
+    if (!options) options = {};
+
+    closeNotification(this, null);
+
+    var dialog = dialogDiv(this, template, options.bottom);
+    var closed = false, me = this;
+    function close(newVal) {
+      if (typeof newVal == 'string') {
+        inp.value = newVal;
+      } else {
+        if (closed) return;
+        closed = true;
+        CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+        dialog.parentNode.removeChild(dialog);
+        me.focus();
+
+        if (options.onClose) options.onClose(dialog);
+      }
+    }
+
+    var inp = dialog.getElementsByTagName("input")[0], button;
+    if (inp) {
+      inp.focus();
+
+      if (options.value) {
+        inp.value = options.value;
+        if (options.selectValueOnOpen !== false) {
+          inp.select();
+        }
+      }
+
+      if (options.onInput)
+        CodeMirror.on(inp, "input", function(e) { options.onInput(e, inp.value, close);});
+      if (options.onKeyUp)
+        CodeMirror.on(inp, "keyup", function(e) {options.onKeyUp(e, inp.value, close);});
+
+      CodeMirror.on(inp, "keydown", function(e) {
+        if (options && options.onKeyDown && options.onKeyDown(e, inp.value, close)) { return; }
+        if (e.keyCode == 27 || (options.closeOnEnter !== false && e.keyCode == 13)) {
+          inp.blur();
+          CodeMirror.e_stop(e);
+          close();
+        }
+        if (e.keyCode == 13) callback(inp.value, e);
+      });
+
+      if (options.closeOnBlur !== false) CodeMirror.on(dialog, "focusout", function (evt) {
+        if (evt.relatedTarget !== null) close();
+      });
+    } else if (button = dialog.getElementsByTagName("button")[0]) {
+      CodeMirror.on(button, "click", function() {
+        close();
+        me.focus();
+      });
+
+      if (options.closeOnBlur !== false) CodeMirror.on(button, "blur", close);
+
+      button.focus();
+    }
+    return close;
+  });
+
+  CodeMirror.defineExtension("openConfirm", function(template, callbacks, options) {
+    closeNotification(this, null);
+    var dialog = dialogDiv(this, template, options && options.bottom);
+    var buttons = dialog.getElementsByTagName("button");
+    var closed = false, me = this, blurring = 1;
+    function close() {
+      if (closed) return;
+      closed = true;
+      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+      dialog.parentNode.removeChild(dialog);
+      me.focus();
+    }
+    buttons[0].focus();
+    for (var i = 0; i < buttons.length; ++i) {
+      var b = buttons[i];
+      (function(callback) {
+        CodeMirror.on(b, "click", function(e) {
+          CodeMirror.e_preventDefault(e);
+          close();
+          if (callback) callback(me);
+        });
+      })(callbacks[i]);
+      CodeMirror.on(b, "blur", function() {
+        --blurring;
+        setTimeout(function() { if (blurring <= 0) close(); }, 200);
+      });
+      CodeMirror.on(b, "focus", function() { ++blurring; });
+    }
+  });
+
+  /*
+   * openNotification
+   * Opens a notification, that can be closed with an optional timer
+   * (default 5000ms timer) and always closes on click.
+   *
+   * If a notification is opened while another is opened, it will close the
+   * currently opened one and open the new one immediately.
+   */
+  CodeMirror.defineExtension("openNotification", function(template, options) {
+    closeNotification(this, close);
+    var dialog = dialogDiv(this, template, options && options.bottom);
+    var closed = false, doneTimer;
+    var duration = options && typeof options.duration !== "undefined" ? options.duration : 5000;
+
+    function close() {
+      if (closed) return;
+      closed = true;
+      clearTimeout(doneTimer);
+      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+      dialog.parentNode.removeChild(dialog);
+    }
+
+    CodeMirror.on(dialog, 'click', function(e) {
+      CodeMirror.e_preventDefault(e);
+      close();
+    });
+
+    if (duration)
+      doneTimer = setTimeout(close, duration);
+
+    return close;
+  });
+});

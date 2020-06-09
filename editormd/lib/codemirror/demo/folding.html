@@ -1,4 +1,61 @@
-<!-- build time:Mon Jun 08 2020 22:22:07 GMT+0800 (Central Standard Time) --><!doctype html><head><title>CodeMirror: Code Folding Demo</title><meta charset="utf-8"><link rel="stylesheet" href="../doc/docs.css"><style>.some-css{color:red;line-height:2}</style><link rel="stylesheet" href="../lib/codemirror.css"><link rel="stylesheet" href="../addon/fold/foldgutter.css"><script src="../lib/codemirror.js"></script><script src="../addon/fold/foldcode.js"></script><script src="../addon/fold/foldgutter.js"></script><script src="../addon/fold/brace-fold.js"></script><script src="../addon/fold/xml-fold.js"></script><script src="../addon/fold/indent-fold.js"></script><script src="../addon/fold/markdown-fold.js"></script><script src="../addon/fold/comment-fold.js"></script><script src="../mode/javascript/javascript.js"></script><script src="../mode/xml/xml.js"></script><script src="../mode/css/css.js"></script><script src="../mode/htmlmixed/htmlmixed.js"></script><script src="../mode/python/python.js"></script><script src="../mode/markdown/markdown.js"></script><style>.CodeMirror{border-top:1px solid #000;border-bottom:1px solid #000}</style><meta name="generator" content="Hexo 4.2.0"></head><body><div id="nav"><a href="https://codemirror.net" target="_blank" rel="noopener"><h1>CodeMirror</h1><img id="logo" src="../doc/logo.png" srcset="/img/loading.gif"></a><ul><li><a href="../index.html">Home</a></li><li><a href="../doc/manual.html">Manual</a></li><li><a href="https://github.com/codemirror/codemirror" target="_blank" rel="noopener">Code</a></li></ul><ul><li><a class="active" href="#">Code Folding</a></li></ul></div><article><h2>Code Folding Demo</h2><form><div style="max-width:50em;margin-bottom:1em">JavaScript:<br><textarea id="code" name="code"></textarea></div><div style="max-width:50em;margin-bottom:1em">HTML:<br><textarea id="code-html" name="code-html"></textarea></div><div style="max-width:50em;margin-bottom:1em">JSON with custom widget:<br><textarea id="code-json" name="code-json">
+<!doctype html>
+
+<head>
+  <title>CodeMirror: Code Folding Demo</title>
+  <meta charset="utf-8"/>
+  <link rel=stylesheet href="../doc/docs.css">
+
+  <style>
+    .some-css {
+      color: red;
+      line-height: 2;
+    }
+  </style>
+
+  <link rel="stylesheet" href="../lib/codemirror.css">
+  <link rel="stylesheet" href="../addon/fold/foldgutter.css" />
+  <script src="../lib/codemirror.js"></script>
+  <script src="../addon/fold/foldcode.js"></script>
+  <script src="../addon/fold/foldgutter.js"></script>
+  <script src="../addon/fold/brace-fold.js"></script>
+  <script src="../addon/fold/xml-fold.js"></script>
+  <script src="../addon/fold/indent-fold.js"></script>
+  <script src="../addon/fold/markdown-fold.js"></script>
+  <script src="../addon/fold/comment-fold.js"></script>
+  <script src="../mode/javascript/javascript.js"></script>
+  <script src="../mode/xml/xml.js"></script>
+  <script src="../mode/css/css.js"></script>
+  <script src="../mode/htmlmixed/htmlmixed.js"></script>
+  <script src="../mode/python/python.js"></script>
+  <script src="../mode/markdown/markdown.js"></script>
+  <style>
+    .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+  </style>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+<div id=nav>
+  <a href="https://codemirror.net" target="_blank" rel="noopener"><h1>CodeMirror</h1><img id=logo src="../doc/logo.png" srcset="/img/loading.gif"></a>
+
+  <ul>
+    <li><a href="../index.html">Home</a>
+    <li><a href="../doc/manual.html">Manual</a>
+    <li><a href="https://github.com/codemirror/codemirror" target="_blank" rel="noopener">Code</a>
+  </ul>
+  <ul>
+    <li><a class=active href="#">Code Folding</a>
+  </ul>
+</div>
+
+<article>
+  <h2>Code Folding Demo</h2>
+  <form>
+    <div style="max-width: 50em; margin-bottom: 1em">JavaScript:<br>
+    <textarea id="code" name="code"></textarea></div>
+    <div style="max-width: 50em; margin-bottom: 1em">HTML:<br>
+    <textarea id="code-html" name="code-html"></textarea></div>    
+    <div style="max-width: 50em; margin-bottom: 1em">JSON with custom widget:<br>
+    <textarea id="code-json" name="code-json">
 {
   "menu": {
     "id": "file",
@@ -12,7 +69,9 @@
     }
   }
 }
-    </textarea></div><div style="max-width:50em">Python:<br><textarea id="code-python" name="code">
+    </textarea></div>
+    <div style="max-width: 50em">Python:<br>
+    <textarea id="code-python" name="code">
 def foo():
   do_some_stuff()
   here
@@ -28,7 +87,12 @@ class Bar:
   this_code_makes_no_sense():
     pass
 
-# A comment</textarea></div><div style="max-width:50em">Markdown:<br><textarea id="code-markdown" name="code"></textarea></div></form><script id="script">/*
+# A comment</textarea></div>
+    <div style="max-width: 50em">Markdown:<br>
+    <textarea id="code-markdown" name="code"></textarea></div>
+  </form>
+  <script id="script">
+/*
  * Demonstration of code folding
  */
 window.onload = function() {
@@ -114,4 +178,7 @@ window.onload = function() {
     foldGutter: true,
     gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
   });
-};</script></article></body><!-- rebuild by neat -->
+};
+  </script>
+</article>
+</body>
