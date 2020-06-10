@@ -1,27 +1,3 @@
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: https://codemirror.net/LICENSE
-
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  CodeMirror.defineOption("showTrailingSpace", false, function(cm, val, prev) {
-    if (prev == CodeMirror.Init) prev = false;
-    if (prev && !val)
-      cm.removeOverlay("trailingspace");
-    else if (!prev && val)
-      cm.addOverlay({
-        token: function(stream) {
-          for (var l = stream.string.length, i = l; i && /\s/.test(stream.string.charAt(i - 1)); --i) {}
-          if (i > stream.pos) { stream.pos = i; return null; }
-          stream.pos = l;
-          return "trailingspace";
-        },
-        name: "trailingspace"
-      });
-  });
-});
+// build time:Wed Jun 10 2020 11:37:10 GMT+0800 (Central Standard Time)
+(function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){e.defineOption("showTrailingSpace",false,function(i,n,r){if(r==e.Init)r=false;if(r&&!n)i.removeOverlay("trailingspace");else if(!r&&n)i.addOverlay({token:function(e){for(var i=e.string.length,n=i;n&&/\s/.test(e.string.charAt(n-1));--n){}if(n>e.pos){e.pos=n;return null}e.pos=i;return"trailingspace"},name:"trailingspace"})})});
+//rebuild by neat 
