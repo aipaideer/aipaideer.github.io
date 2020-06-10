@@ -1,3 +1,3 @@
-// build time:Wed Jun 10 2020 12:00:44 GMT+0800 (Central Standard Time)
+// build time:Wed Jun 10 2020 12:10:51 GMT+0800 (Central Standard Time)
 (function(){var r=CodeMirror.getMode({indentUnit:2},"ruby");function e(e){test.mode(e,r,Array.prototype.slice.call(arguments,1))}e("divide_equal_operator","[variable bar] [operator /=] [variable foo]");e("divide_equal_operator_no_spacing","[variable foo][operator /=][number 42]");e("complex_regexp","[keyword if] [variable cr] [operator =~] [string-2 /(?: \\( #{][tag RE_NOT][string-2 }\\( | #{][tag RE_NOT_PAR_OR][string-2 }* #{][tag RE_OPA_OR][string-2 } )/][variable x]");e("indented_heredoc","[keyword def] [def x]","  [variable y] [operator =] [string <<-FOO]","[string     bar]","[string   FOO]","[keyword end]")})();
 //rebuild by neat 
