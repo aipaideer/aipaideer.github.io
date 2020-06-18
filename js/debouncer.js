@@ -1,3 +1,3 @@
-// build time:Sat Jun 13 2020 12:30:06 GMT+0800 (Central Standard Time)
+// build time:Thu Jun 18 2020 12:47:37 GMT+0800 (Central Standard Time)
 window.requestAnimationFrame=window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame;function Debouncer(i){this.callback=i;this.ticking=false}Debouncer.prototype={constructor:Debouncer,update:function(){this.callback&&this.callback();this.ticking=false},requestTick:function(){if(!this.ticking){requestAnimationFrame(this.rafCallback||(this.rafCallback=this.update.bind(this)));this.ticking=true}},handleEvent:function(){this.requestTick()}};
 //rebuild by neat 
