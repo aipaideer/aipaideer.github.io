@@ -1,3 +1,3 @@
-// build time:Thu Jun 18 2020 23:47:45 GMT+0800 (Central Standard Time)
+// build time:Sat Jun 27 2020 19:00:59 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.registerHelper("lint","yaml",function(o){var r=[];if(!window.jsyaml){if(window.console){window.console.error("Error: window.jsyaml not defined, CodeMirror YAML linting cannot run.")}return r}try{jsyaml.loadAll(o)}catch(i){var n=i.mark,t=n?e.Pos(n.line,n.column):e.Pos(0,0),l=t;r.push({from:t,to:l,message:i.message})}return r})});
 //rebuild by neat 
