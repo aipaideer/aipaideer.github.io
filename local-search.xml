@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>欢迎访问JimmyQin&#39;s Blog</title>
+    <link href="/posts/50901.html"/>
+    <url>/posts/50901.html</url>
+    
+    <content type="html"><![CDATA[<p>向下继续浏览文章！更多功能请看导航栏。</p><a id="more"></a><p>这是一个为实现某些功能的测试页</p><script language='javascript'>document.location = 'https://jimmyqin.cn/about'</script>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>为Fluid主题简单添加PJAX支持</title>
+    <link href="/posts/34250.html"/>
+    <url>/posts/34250.html</url>
+    
+    <content type="html"><![CDATA[<!-- build time:Sun Jul 05 2020 21:07:02 GMT+0800 (Central Standard Time) --><p>一点微小的工作，初步实现无刷新加载。<a id="more"></a><br><em>本教程仅在Fluid主题1.8.1版本测试通过。</em></p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/pjax.png" srcset="/img/loading.gif" alt=""></p><h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><p><strong>pjax是什么？</strong></p><blockquote><p>pjax 结合 pushState 和 ajax 技术（PJAX=history.pushState+ajax）， 不需要重新加载整个页面就能从服务器加载 Html 到你当前页面，这个 ajax 请求会有永久链接、title 并支持浏览器的回退/前进按钮。</p></blockquote><p>简单来说pjax就是<strong>无刷新加载</strong>，看起来似乎很高端，但其实很多网站都已经在使用和pjax类似的技术，比如百度搜索：在搜索页更换关键词搜索，页面只是部分内容重载。</p><p>pjax的优点和好处很多，仅就个人博客而言，最直观的体验就是能够实现<strong>页面平滑切换</strong>和音乐<strong>不间断播放</strong>。</p><p>pjax效果演示：<a href="http://pjax.herokuapp.com" target="_blank" rel="noopener">http://pjax.herokuapp.com</a><br><del>~ 或者就在<a href="https://jimmyqin.cn" title="本站体验">本站体验</a>。 ~</del></p><p>pjax这般优秀，奈何本站使用的如此好看的Fluid主题竟然不支持，只好自己动手，慢慢摸索和折腾一下。</p><h2 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h2><h3 id="1、版本选用"><a href="#1、版本选用" class="headerlink" title="1、版本选用"></a>1、版本选用</h3><p>ONE.<a href="https://github.com/defunkt/jquery-pjax" target="_blank" rel="noopener" title="jquery-pjax">jquery-pjax</a><br>TWO.<a href="https://github.com/MoOx/pjax" target="_blank" rel="noopener" title="Moox-pjax">Moox-pjax</a></p><p>第一个是需要使用jquery依赖的版本，俩版本大同小异，只是后者代码更新日期较新，在这里我选用了后者。</p><p>推荐首先阅读下<a href="https://github.com/MoOx/pjax/blob/master/README.md" target="_blank" rel="noopener" title="官方文档">官方文档</a>。</p><h3 id="2、引入js"><a href="#2、引入js" class="headerlink" title="2、引入js"></a>2、引入js</h3><p>在<code>/主题目录/layout/partial/footer.ejs</code>中加入</p><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><p>来引入pjax；</p><p>或者使用npm安装本地后引用</p><pre><code class="hljs bash">$ npm install pjax</code></pre><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"./node_modules/pjax/pjax.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><p>现在，我们已经安成了pjax的安装，本地预览一下，页面跳转已初见成效。但你可能会发现，标题消失、图片失效等等各项功能异常。别着急，这是由于部分js未能加载导致的，稍后会解决。</p><h2 id="三、使用"><a href="#三、使用" class="headerlink" title="三、使用"></a>三、使用</h2><h3 id="1、功能配置"><a href="#1、功能配置" class="headerlink" title="1、功能配置"></a>1、功能配置</h3><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="actionscript">    <span class="hljs-comment">// pjax</span>    <span class="hljs-keyword">var</span> pjax = <span class="hljs-keyword">new</span> Pjax(&#123;    selectors: [      <span class="hljs-string">"title"</span>, <span class="hljs-comment">//加载标题</span>      <span class="hljs-string">"main"</span>, <span class="hljs-comment">//加载主体框架部分</span>      <span class="hljs-string">"header"</span>, <span class="hljs-comment">//加载头部（文章页头图等）</span>    ]   &#125;)</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><blockquote><p>elements选择触发器，即点击什么来触发pjax（只能用a或者form），a为链接。<br>selectors根据css选择器来选择更新的节点（即当触发elements时哪些内容会刷新，其余部分保持不变）</p></blockquote><p>有用的pjax函数</p><pre><code class="hljs javascript">pjax.loadUrl();<span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:send'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;&#125;);<span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;&#125;);<span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;&#125;);</code></pre><h3 id="2、项目优化"><a href="#2、项目优化" class="headerlink" title="2、项目优化"></a>2、项目优化</h3><h4 id="2-1-Valine评论重载"><a href="#2-1-Valine评论重载" class="headerlink" title="2.1 Valine评论重载"></a>2.1 Valine评论重载</h4><p>在Fluid1.8.1版本中已经解决了 <strong>pjax刷新后发现评论不能加载</strong> 这个<a href="https://github.com/xCss/Valine/issues/138" target="_blank" rel="noopener" title="问题">问题</a>，如果使用<strong>1.8.0及以下版本</strong>需要进行下面的操作。<br>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p><pre><code class="hljs javascript"><span class="hljs-comment">//加载valine</span><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">LoadValine</span>(<span class="hljs-params"></span>)</span>&#123;      $.getScript(<span class="hljs-string">"https://cdn.staticfile.org/valine/1.4.14/Valine.min.js"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;                  <span class="hljs-comment">// 生成评论的代码</span>        <span class="hljs-keyword">var</span> GUEST_INFO = [<span class="hljs-string">'nick'</span>,<span class="hljs-string">'mail'</span>,<span class="hljs-string">'link'</span>];        <span class="hljs-keyword">var</span> guest_info = <span class="hljs-string">'&lt;%= theme.valine.meta %&gt;'</span>.split(<span class="hljs-string">','</span>).filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">item</span>)</span>&#123;          <span class="hljs-keyword">return</span> GUEST_INFO.indexOf(item) &gt; <span class="hljs-number">-1</span>        &#125;);        <span class="hljs-keyword">var</span> valine = <span class="hljs-keyword">new</span> Valine();        valine.init(&#123;          <span class="hljs-attr">el</span>: <span class="hljs-string">"#vcomments"</span>,          <span class="hljs-attr">guest_info</span>: guest_info,          <span class="hljs-attr">app_id</span>: <span class="hljs-string">"&lt;%= theme.valine.appid %&gt;"</span>,          <span class="hljs-attr">app_key</span>: <span class="hljs-string">"&lt;%= theme.valine.appkey %&gt;"</span>,          <span class="hljs-attr">placeholder</span>: <span class="hljs-string">"&lt;%= theme.valine.placeholder %&gt;"</span>,          <span class="hljs-attr">path</span>: &lt;%= theme.valine.path %&gt;,          <span class="hljs-attr">avatar</span>: <span class="hljs-string">"&lt;%= theme.valine.avatar %&gt;"</span>,          <span class="hljs-attr">meta</span>: &lt;%- <span class="hljs-built_in">JSON</span>.stringify(theme.valine.meta || []) %&gt;,          <span class="hljs-attr">pageSize</span>: <span class="hljs-string">"&lt;%= theme.valine.pageSize %&gt;"</span>,          <span class="hljs-attr">lang</span>: <span class="hljs-string">"&lt;%= theme.valine.lang %&gt;"</span>,          <span class="hljs-attr">highlight</span>: &lt;%= theme.valine.highlight %&gt;,          <span class="hljs-attr">recordIP</span>: &lt;%= theme.valine.recordIP %&gt;,          <span class="hljs-attr">serverURLs</span>: <span class="hljs-string">"&lt;%= theme.valine.serverURLs %&gt;"</span>        &#125;)    &#125;);  &#125;;</code></pre><p>然后进行这个函数的重载</p><pre><code class="hljs javascript"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;    LoadValine();&#125;);</code></pre><p>如果在<strong>自建页面</strong><a href="https://hexo.fluid-dev.com/docs/example/#在新建页面添加评论" target="_blank" rel="noopener" title="使用了Valine评论">使用了Valine评论</a>，仍需要添加<code>//加载valine</code>函数，但是请将重载指令放在评论所在页面的.md文件中，避免出现评论重复加载现象。同时为了保证在该页面刷新时重载评论，需要使用pjax的load函数。<br>完整示例如下：</p><pre><code class="hljs html"><span class="hljs-comment">&lt;!-- pjax完成/监听刷新加载Valine --&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;   LoadValine(); &#125;);<span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'load'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123;   LoadValine(); &#125;);</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><p>然而，这样操作以后，还是会出现一些bug：在文章页评论加载完毕以后，用户跳转留言页，再返回到刚刚访问的文章页时，会出现评论重复的现象。我还在寻找修复方法，但是一般访问情景应该不会有特别大的影响。<br><del>（谁会在页面之间反复横跳呢？）</del></p><h4 id="2-2-懒加载修复"><a href="#2-2-懒加载修复" class="headerlink" title="2.2 懒加载修复"></a>2.2 懒加载修复</h4><p>在<code>/主题目录/layout/layout.ejs</code>中添加重载函数如下：</p><pre><code class="hljs javascript">    <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;      $.getScript(<span class="hljs-string">"/js/lazyload.js"</span>);&#125;);</code></pre><h4 id="2-3-下滑箭头、抖动等修复"><a href="#2-3-下滑箭头、抖动等修复" class="headerlink" title="2.3 下滑箭头、抖动等修复"></a>2.3 下滑箭头、抖动等修复</h4><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p><pre><code class="hljs javascript"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;  $.getScript(<span class="hljs-string">"/js/main.js"</span>);  $.getScript(<span class="hljs-string">"/js/debouncer.js"</span>);&#125;);<span class="hljs-comment">// 窗口监听load(加载、刷新)事件，执行函数</span><span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'load'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123; $.getScript(<span class="hljs-string">"/js/main.js"</span>);&#125;);</code></pre><h4 id="2-4-FancyBox重载"><a href="#2-4-FancyBox重载" class="headerlink" title="2.4 FancyBox重载"></a>2.4 FancyBox重载</h4><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p><pre><code class="hljs javascript">  <span class="hljs-comment">//加载FancyBox</span>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">LoadFancyBox</span>(<span class="hljs-params"></span>)</span>&#123;$(<span class="hljs-string">'#post img:not(.no-zoom img, img[no-zoom]), img[zoom]'</span>).each(     <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;       <span class="hljs-keyword">var</span> element = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'a'</span>);       $(element).attr(<span class="hljs-string">'data-fancybox'</span>, <span class="hljs-string">'images'</span>);       $(element).attr(<span class="hljs-string">'href'</span>, $(<span class="hljs-keyword">this</span>).attr(<span class="hljs-string">'src'</span>));       $(<span class="hljs-keyword">this</span>).wrap(element);     &#125;   );  &#125;;</code></pre><p>然后进行这个函数的重载</p><pre><code class="hljs javascript"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;     LoadFancyBox();&#125;);</code></pre><p>bug：在关闭放大的图片后，页面会漂移。<br>我暂时关闭了这个功能。</p><h4 id="2-5-修复MarkDown样式丢失"><a href="#2-5-修复MarkDown样式丢失" class="headerlink" title="2.5 修复MarkDown样式丢失"></a>2.5 修复MarkDown样式丢失</h4><p>在<a href="https://github.com/fluid-dev/hexo-theme-fluid/commit/6bc9ad2f872c6c50e5127665fb07af55f6269618" target="_blank" rel="noopener" title="Fluid1.8.1的更新">Fluid1.8.1的更新</a>中，强哥加入判断以减少不必要的加载项，但加入pjax之后判断似乎失效了，那么就干脆不要判断好了<del>（反向升级）</del>。<br>将<code>/主题目录/layout/_partial/css.ejs</code>中的<code>&lt;% if (is_post() || is_page()) { %&gt;</code>判断删除即可。</p><h4 id="2-6-加入加载动画"><a href="#2-6-加入加载动画" class="headerlink" title="2.6 加入加载动画"></a>2.6 加入加载动画</h4><p>css如下:</p><pre><code class="hljs css"><span class="hljs-selector-class">.loading</span>&#123;<span class="hljs-attribute">display</span>:none&#125;<span class="hljs-selector-class">.loading</span>&#123;<span class="hljs-attribute">height</span>:<span class="hljs-number">100%</span>;<span class="hljs-attribute">width</span>:<span class="hljs-number">100%</span>;<span class="hljs-attribute">position</span>:fixed;<span class="hljs-attribute">top</span>:<span class="hljs-number">0</span>;<span class="hljs-attribute">left</span>:<span class="hljs-number">0</span>;<span class="hljs-attribute">z-index</span>:<span class="hljs-number">999999</span>;<span class="hljs-attribute">background-color</span>:<span class="hljs-built_in">rgba</span>(<span class="hljs-number">250</span>,<span class="hljs-number">250</span>,<span class="hljs-number">250</span>,.<span class="hljs-number">9</span>)&#125;<span class="hljs-selector-class">.loading</span> <span class="hljs-selector-tag">img</span>&#123;<span class="hljs-attribute">width</span>: <span class="hljs-number">280px</span>;<span class="hljs-attribute">height</span>:<span class="hljs-number">210px</span>;<span class="hljs-attribute">position</span>: relative;<span class="hljs-attribute">top</span>: <span class="hljs-number">45%</span>;<span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>;<span class="hljs-attribute">margin-left</span>:-<span class="hljs-number">140px</span>;<span class="hljs-attribute">margin-top</span>: -<span class="hljs-number">105px</span>;&#125;<span class="hljs-selector-id">#loader</span>&#123;<span class="hljs-attribute">display</span>: block; <span class="hljs-attribute">position</span>: relative; <span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>; <span class="hljs-attribute">top</span>: <span class="hljs-number">50%</span>; <span class="hljs-attribute">width</span>: <span class="hljs-number">150px</span>; <span class="hljs-attribute">height</span>: <span class="hljs-number">150px</span>; <span class="hljs-attribute">margin</span>: -<span class="hljs-number">75px</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> -<span class="hljs-number">75px</span>; <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">50%</span>; <span class="hljs-attribute">border</span>: <span class="hljs-number">3px</span> solid transparent; <span class="hljs-attribute">border-top-color</span>: <span class="hljs-number">#ff5a5a</span>; <span class="hljs-attribute">-webkit-animation</span>: spin <span class="hljs-number">1s</span> linear infinite; <span class="hljs-attribute">animation</span>: spin <span class="hljs-number">1s</span> linear infinite;&#125;<span class="hljs-selector-id">#loader</span><span class="hljs-selector-pseudo">:before</span>&#123;<span class="hljs-attribute">content</span>: <span class="hljs-string">""</span>; <span class="hljs-attribute">position</span>: absolute; <span class="hljs-attribute">top</span>: <span class="hljs-number">5px</span>; <span class="hljs-attribute">left</span>: <span class="hljs-number">5px</span>; <span class="hljs-attribute">right</span>: <span class="hljs-number">5px</span>; <span class="hljs-attribute">bottom</span>: <span class="hljs-number">5px</span>; <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">50%</span>; <span class="hljs-attribute">border</span>: <span class="hljs-number">3px</span> solid transparent; <span class="hljs-attribute">border-top-color</span>: <span class="hljs-number">#5af33f</span>; <span class="hljs-attribute">-webkit-animation</span>: spin <span class="hljs-number">3s</span> linear infinite; <span class="hljs-attribute">animation</span>: spin <span class="hljs-number">3s</span> linear infinite;&#125;<span class="hljs-selector-id">#loader</span><span class="hljs-selector-pseudo">:after</span>&#123;<span class="hljs-attribute">content</span>: <span class="hljs-string">""</span>; <span class="hljs-attribute">position</span>: absolute; <span class="hljs-attribute">top</span>: <span class="hljs-number">15px</span>; <span class="hljs-attribute">left</span>: <span class="hljs-number">15px</span>; <span class="hljs-attribute">right</span>: <span class="hljs-number">15px</span>; <span class="hljs-attribute">bottom</span>: <span class="hljs-number">15px</span>; <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">50%</span>; <span class="hljs-attribute">border</span>: <span class="hljs-number">3px</span> solid transparent; <span class="hljs-attribute">border-top-color</span>: <span class="hljs-number">#6dc9ff</span>; <span class="hljs-attribute">-webkit-animation</span>: spin <span class="hljs-number">2s</span> linear infinite; <span class="hljs-attribute">animation</span>: spin <span class="hljs-number">2s</span> linear infinite;&#125;<span class="hljs-keyword">@-webkit-keyframes</span> spin&#123;0%&#123;<span class="hljs-attribute">-webkit-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>); <span class="hljs-attribute">-ms-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>); <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>);&#125; 100%&#123;<span class="hljs-attribute">-webkit-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>); <span class="hljs-attribute">-ms-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>); <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>);&#125;&#125;<span class="hljs-keyword">@keyframes</span> spin&#123;0%&#123;<span class="hljs-attribute">-webkit-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>); <span class="hljs-attribute">-ms-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>); <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">0deg</span>);&#125; 100%&#123;<span class="hljs-attribute">-webkit-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>); <span class="hljs-attribute">-ms-transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>); <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotate</span>(<span class="hljs-number">360deg</span>);&#125;&#125;</code></pre><p>pjax载入动画：</p><pre><code class="hljs javascript">  <span class="hljs-comment">// 开始 PJAX 执行的函数</span>  <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:send'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;$(<span class="hljs-string">".loading"</span>).css(<span class="hljs-string">"display"</span>, <span class="hljs-string">"block"</span>);<span class="hljs-comment">//加载转圈圈的css</span> &#125;); <span class="hljs-comment">// PJAX 完成之后执行的函数，可以和上面的重载放在一起</span> <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;$(<span class="hljs-string">".loading"</span>).css(<span class="hljs-string">"display"</span>, <span class="hljs-string">"none"</span>);</code></pre><p>另外推荐一下Nprogress.js也很好看。</p><h2 id="四、本站pjax完整代码"><a href="#四、本站pjax完整代码" class="headerlink" title="四、本站pjax完整代码"></a>四、本站pjax完整代码</h2><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">  <span class="hljs-comment">// pjax</span>  <span class="hljs-keyword">var</span> pjax = <span class="hljs-keyword">new</span> Pjax(&#123;  <span class="hljs-attr">selectors</span>: [    <span class="hljs-string">"title"</span>,    <span class="hljs-string">"main"</span>,    <span class="hljs-string">"header"</span>,  ] &#125;)            <span class="hljs-comment">//加载valine</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">LoadValine</span>(<span class="hljs-params"></span>)</span>&#123;    $.getScript(<span class="hljs-string">"https://cdn.staticfile.org/valine/1.4.14/Valine.min.js"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;              <span class="hljs-comment">// 生成评论的代码</span>      <span class="hljs-keyword">var</span> GUEST_INFO = [<span class="hljs-string">'nick'</span>,<span class="hljs-string">'mail'</span>,<span class="hljs-string">'link'</span>];      <span class="hljs-keyword">var</span> guest_info = <span class="hljs-string">'&lt;%= theme.valine.meta %&gt;'</span>.split(<span class="hljs-string">','</span>).filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">item</span>)</span>&#123;        <span class="hljs-keyword">return</span> GUEST_INFO.indexOf(item) &gt; <span class="hljs-number">-1</span>      &#125;);      <span class="hljs-keyword">var</span> valine = <span class="hljs-keyword">new</span> Valine();      valine.init(&#123;        <span class="hljs-attr">el</span>: <span class="hljs-string">"#vcomments"</span>,        <span class="hljs-attr">guest_info</span>: guest_info,        <span class="hljs-attr">app_id</span>: <span class="hljs-string">"&lt;%= theme.valine.appid %&gt;"</span>,        <span class="hljs-attr">app_key</span>: <span class="hljs-string">"&lt;%= theme.valine.appkey %&gt;"</span>,        <span class="hljs-attr">placeholder</span>: <span class="hljs-string">"&lt;%= theme.valine.placeholder %&gt;"</span>,        <span class="hljs-attr">path</span>: &lt;%= theme.valine.path %&gt;,        <span class="hljs-attr">avatar</span>: <span class="hljs-string">"&lt;%= theme.valine.avatar %&gt;"</span>,        <span class="hljs-attr">meta</span>: &lt;%- <span class="hljs-built_in">JSON</span>.stringify(theme.valine.meta || []) %&gt;,        <span class="hljs-attr">pageSize</span>: <span class="hljs-string">"&lt;%= theme.valine.pageSize %&gt;"</span>,        <span class="hljs-attr">lang</span>: <span class="hljs-string">"&lt;%= theme.valine.lang %&gt;"</span>,        <span class="hljs-attr">highlight</span>: &lt;%= theme.valine.highlight %&gt;,        <span class="hljs-attr">recordIP</span>: &lt;%= theme.valine.recordIP %&gt;,        <span class="hljs-attr">serverURLs</span>: <span class="hljs-string">"&lt;%= theme.valine.serverURLs %&gt;"</span>      &#125;)  &#125;);&#125;;      <span class="hljs-comment">//pjax开始时加载函数</span>    <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:send'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;  $(<span class="hljs-string">".loading"</span>).css(<span class="hljs-string">"display"</span>, <span class="hljs-string">"block"</span>);<span class="hljs-comment">//加载转圈圈的css</span>   &#125;);         <span class="hljs-comment">// pjax加载结束后执行函数</span>    <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'pjax:complete'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>)</span>&#123;    $(<span class="hljs-string">".loading"</span>).css(<span class="hljs-string">"display"</span>, <span class="hljs-string">"none"</span>);      $.getScript(<span class="hljs-string">"/js/lazyload.js"</span>);      $.getScript(<span class="hljs-string">"/js/main.js"</span>);      $.getScript(<span class="hljs-string">"/js/debouncer.js"</span>);    &#125;);        <span class="hljs-comment">// 窗口监听load(加载、刷新)事件，执行函数</span>    <span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'load'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>&#123;     $.getScript(<span class="hljs-string">"/js/main.js"</span>);    &#125;);    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><h2 id="五、To-Do-List"><a href="#五、To-Do-List" class="headerlink" title="五、To Do List"></a>五、To Do List</h2><p>以下功能暂时还没有修复，后期慢慢研究，也期待有大佬提供解决方案。</p><p>代码高亮和复制按钮<br>Valine评论重复问题<br>FancyBox漂移问题<br>Typed.js文本打字机<br>Toc.js文章目录<br>anchor锚点<br>其他评论系统<br>Editor.md编辑器</p><h2 id="六、后记"><a href="#六、后记" class="headerlink" title="六、后记"></a>六、后记</h2><p>参考文章：<br><a href="https://www.jianshu.com/p/557cad38e7dd" target="_blank" rel="noopener">https://www.jianshu.com/p/557cad38e7dd</a><br><a href="https://inkss.cn/article/other/80b5f235.html" target="_blank" rel="noopener">https://inkss.cn/article/other/80b5f235.html</a><br>感谢：<a href="https://lluuiq.com/" target="_blank" rel="noopener" title="lluuiq">lluuiq</a> 和 <a href="https://jsonpop.cn/" target="_blank" rel="noopener" title="MoMik">MoMik</a> 对本站pjax实现过程中的指导和帮助。<br>由于个人能力实在有限，导致bug多多，还是期待Fluid官方支持pjax。</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p><!-- rebuild by neat -->]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>教程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>原道耳机上手测评，真-越级体验？</title>
+    <link href="/posts/33906.html"/>
+    <url>/posts/33906.html</url>
+    
+    <content type="html"><![CDATA[<!-- build time:Mon Jun 15 2020 08:20:11 GMT+0800 (Central Standard Time) --><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao.png" srcset="/img/loading.gif" alt=""><br>最近入手了网上很火的平头塞——原道（的兄弟）<strong>无迹</strong>耳机，这样一款被网友们描述的出神入化的入门塞究竟如何，且做非专业评测。<a id="more"></a><br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao1.png" srcset="/img/loading.gif" alt=""><br>说实话，我是被这款耳机的营销所打败的，铺天盖地的宣传，屡发不爽的<strong>表情包</strong>，迷幻的价格，发烧的玄学，听完究竟会不会落泪呢？带着满满好奇和图个乐子的心态购置上手，没想到能收获到很多惊喜。<br>凭借马老板亏大了优惠券，选择了这款所谓红蓝特别版，看似颜值不错。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao2.jpg" srcset="/img/loading.gif" alt=""><br>收货开箱，包装真是异常之<strong>简陋</strong>，一个塑封袋子装着耳机和仅一副海绵套便是快递全部内容。竟然连一个店家信息卡片都没有，大抵是为了节约成本，当然，如果真的能把成本专心花在耳机上，的确是好事。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao3.jpg" srcset="/img/loading.gif" alt=""><br>耳机主体是半透明塑料腔体，双股音频线质地略硬，但还比较抗缠绕，整体质感符合价格定位，多少有些DIY的气质。<br>选取试音歌曲是杰伦新歌摸鸡头《<em>Mojito</em>》和阿鲲的《<em>开启新征程</em>》。两首歌曲分别测试流行人声和低频纯音。<del>杰哥人声清晰，鲲鲲电音带劲。</del>（雾）<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao4.png" srcset="/img/loading.gif" alt=""><br>如大部分较真实测评所言，耳机动态范围和<strong>解析力</strong>还是比较出色，在<strong>同价位</strong>甚至略高价位中能够脱颖而出。三频均衡，但低频下潜略微欠佳。整体感受十分通透，听完30min下来没有特别轰头的感觉。只是耳机用mx500的公模，对我来说还是太大了点，有点挤耳朵。<br>试用完毕，摘下耳机，睁开双眼。眼泪倒是没有落下，有的只是嘴角微微上扬的惬意。一款价格亲亲民的耳塞，打着入门发烧的旗号，带着有趣的故事，杀进机圈，还是<strong>值得一试</strong>。小小耳机，能带来快乐，不慎损坏也无妨，大不了再来一条，何乐而不为呢？<br>哈哈，我都这么夸了，是不是要去找店家结一下广告费？<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yuandao5.jpg" srcset="/img/loading.gif" alt=""><br>不过，还是算了，毕竟…白嫖真香…<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt="感谢阅读" title="（感谢阅读）"></p><!-- rebuild by neat -->]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>好玩的</tag>
+      
+      <tag>测评</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>如果我是一只猫，你会爱我吗？</title>
+    <link href="/posts/55659.html"/>
+    <url>/posts/55659.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>岁月在她身上留下的深浅痕迹，不过都是爱你的印记。<br> <a id="more"></a></p></blockquote><p><img src="https://rmt.dogedoge.com/fetch/~/source/unsplash/photo-1515002246390-7bf7e8f87b54?auto=format&fit=crop&w=800&q=80" srcset="/img/loading.gif" alt=""></p><p>因为社会老龄化严重，人们出行和使用公共设施经常被老人占用、拥堵，变得非常不方便，部分年轻人开始对上年纪的人产生了恶感，甚至网上还有极端主义者，呼吁把“老害”无害化灭活的话题。</p><p>为了制止愈演愈烈的针对老年人的案件，某电子公司研发出了一种可穿戴三维投影机——只要把一根项圈戴在老人的脖子上，他/她就会在别人眼中变成一只猫的样子。</p><p>一时间街道广场甚至电车中充满了慢吞吞悠闲行走的大猫咪，后来，又出现了各种各样的狗。</p><p>针对老年人的霸凌行为一下子变少了，即使知道对方是人类，电车上依旧有很多人会主动让出座位给大猫咪大狗子们盘卧，自己则笑嘻嘻的在一旁看着，还有一些人会给大猫大狗们食物，抚摸着他们和他们拍照，专门跑去广场看他们跳舞。有一些猫猫狗狗脾气暴躁，大声呵斥贴上来偷拍的，那声音也会被音频软件处理成猫猫狗狗的喵喵汪汪，大家听见了，也只会发出善意的笑声，还有一些已经痴痴呆呆的，被人放在推车上带到屋外，马上就会围拢上来一群人，夸它们安静可爱，推车的人就笑嘻嘻的摸着自己的大猫猫狗狗，温柔的说：“他已经不认识我了，但它一直好乖的。”</p><p><img src="https://rmt.dogedoge.com/fetch/~/source/unsplash/photo-1415369629372-26f2fe60c467?q=80&fmt=jpg&auto=format&fit=crop&w=334" srcset="/img/loading.gif" alt=""></p><p>她是65岁后成为的猫，外貌是小孙子最喜欢的缅因，有着绵密的毛，大大的耳朵，亮闪闪的眼睛，还有一根在空气中摇晃着尖尖的大尾巴。每周，孩子都要来奶奶家住一天，和他最爱的大猫猫一起看视频，玩游戏，直到儿子儿媳来接，才会恋恋不舍的离开。</p><p>晚上，她的项圈突然出了故障，怎么都冲不上电，鼓捣了半天也没修好，没办法，她决定明天再打电话找维修人员上门。因为折腾这个项圈折腾的比较晚，第二天，她听到门铃的时候才醒过来。</p><p>打开门，小孙子在外面站着。</p><p>“我家的老猫猫呢？”</p><p>孩子问。</p><p>“傻孩子，哪有什么老猫猫，陪你玩的一直都是奶奶呀。”</p><p>孩子沉默的躲开了她去牵她的手，目光中满是敌意。这让她彻底醒了，看着在孩子稚嫩脸颊旁停滞的，自己苍老褶皱的手，她突然有了一种仿佛在裸奔的羞耻感。</p><p>半晌，孩子扭头跑向了电梯，拼命的按着下楼的按键，合拢的电梯门缝隙后，是一副惊恐万分的表情。</p><p>儿子打来电话的时候，她拿着坏掉的项圈，慢慢的走在去维修店的路上。儿子埋怨她破坏了孙子对美好世界的幻想，现在哭着不想从屋子里出来，儿媳妇怎么劝都不听。</p><p>“让孩子失望这件事，真的很严重的！”</p><p>儿子说完这句话就挂了电话，她茫然的垂下手，慢吞吞的继续走在路上，想起儿子这么大的时候，无奈的跟她说：“妈妈，能不能让我爸这个圣诞老人别再在圣诞礼物中给我送毛衣外套了，我想要一双篮球鞋。”</p><p>她抬起头，突然发现，自己很久以前坐的公车站，已经变成了花坛。她有点紧张，一时间都有些恍惚起来，连景象也变得不熟悉了，她想求助，但街上只有光鲜亮丽的年轻人，他们的目光在她身上短暂停留，马上就飘飞了过去，甚至有些人露出了厌恶的表情。</p><p>她突然流下了眼泪，蹲在了地上。</p><p>年轻的人们有些吃惊的看到，本来在街上慢悠悠溜达的猫猫狗狗们，围住了那个丑丑笨笨的老太太，发出温柔的呢喃，抱住了她……</p><hr><blockquote><p>也许你我终会老去。但爱，应从现在开始</p></blockquote><p>本文为转载作品<br>文章版权归原作者所有</p><p>作者： 微博@荀夜羽<br>编辑： JimmyQin（挨拍的儿）<br>图源： Unsplash</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end3.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>转载</tag>
+      
+      <tag>小说</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Heroku部署Hexo靠谱教程</title>
+    <link href="/posts/29159.html"/>
+    <url>/posts/29159.html</url>
+    
+    <content type="html"><![CDATA[<h2 id="Heroku部署Hexo教程"><a href="#Heroku部署Hexo教程" class="headerlink" title="Heroku部署Hexo教程"></a>Heroku部署Hexo教程</h2><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/heroku.jpg" srcset="/img/loading.gif" alt=""><br>Hexo在5月14日更新了4.2.1版本，吸引我又在官网逛了一圈，不经意间发现了关于<em>部署heroku</em> 的提示。这个平台不曾熟悉，便细细查询，且研究一番。</p><a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero1.jpg" srcset="/img/loading.gif" alt=""></p><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote><p>Heroku是一个支持多种编程语言的云服务平台。在2010年被Salesforce.com收购。Heroku支持Node.js、Ruby、Java、PHP、Python、Go、Scala、Clojure语言。基础操作系统是Debian，在最新的堆栈则是基于Debian的Ubuntu。</p></blockquote><p><a href="https://heroku.com" target="_blank" rel="noopener" title="官网传送biu~">官网传送biu~</a><br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero2.jpg" srcset="/img/loading.gif" alt=""></p><p>最重要的是：<br>1、提供<strong>免费</strong>服务<br>2、国内可正常访问<br>给我们在其上搭建Hexo提供了可能。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero3.jpg" srcset="/img/loading.gif" alt=""></p><hr><p>在网上查询资料，有关在Heroku搭建Hexo的教程数量甚微且发布时间较久，有些步骤也不再正确，便重新整理了一份教程来分享。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero4.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>如果你还不知道Hexo是啥，那么…<a href="https://hexo.io" target="_blank" rel="noopener" title="（点我跳转）">（点我跳转）</a></p><h3 id="1、注册Heroku账号"><a href="#1、注册Heroku账号" class="headerlink" title="1、注册Heroku账号"></a>1、注册Heroku账号</h3><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero5.jpg" srcset="/img/loading.gif" alt=""><br>在官网首页点击sign up按钮，跳转注册页面，填写相关信息。<br><strong>注意：</strong><br>1、邮箱请使用国外邮箱（如Gmail等），国内邮箱（如QQ等）会无法注册。<br>2、注册过程中请<em>科学の上网</em> 以使用reCaptcha验证插件。</p><p>然后，在你的邮箱点击注册验证链接就注册成功啦！</p><h3 id="2、登陆并创建新应用"><a href="#2、登陆并创建新应用" class="headerlink" title="2、登陆并创建新应用"></a>2、登陆并创建新应用</h3><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero6.jpg" srcset="/img/loading.gif" alt=""><br>创建完成后不需要进行什么额外的配置。<br>可以转到设置页面，先把git地址复制下来备用。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero7.jpg" srcset="/img/loading.gif" alt=""></p><h3 id="3、本地安装部署插件"><a href="#3、本地安装部署插件" class="headerlink" title="3、本地安装部署插件"></a>3、本地安装部署插件</h3><p>Heroku有桌面平台的软件可供操作，但由于我个人使用手机搭建Hexo，所以采用另一种全平台适用的更简单的方法。</p><p>好的，回到终端，cd你的博客目录，<br>1、安装Heroku管理应用<br><code>$ npm install -g heroku</code><br>——用于Heroku登陆，必须安装！</p><p>2、安装Hexo-deployer-heroku部署插件<br><code>$ npm install hexo-deployer-heroku --save</code><br>——用于一键部署上传。</p><p>然后，修改站点目录下的__config.yml，</p><pre><code class="hljs yaml"><span class="hljs-attr">deploy:</span> <span class="hljs-attr">type:</span> <span class="hljs-string">heroku</span> <span class="hljs-attr">repo:</span> <span class="hljs-string">&lt;repository</span> <span class="hljs-string">url&gt;</span>   <span class="hljs-comment">#如配置多种部署方式，请使用</span>                       <span class="hljs-bullet">-</span> <span class="hljs-string">type</span> <span class="hljs-string">格式</span></code></pre><h3 id="4、上传并发布"><a href="#4、上传并发布" class="headerlink" title="4、上传并发布"></a>4、上传并发布</h3><p>首先，</p><pre><code>$ heroku login</code></pre><p>期间会跳转浏览器授权登陆，根据网络环境不同可能需要<em>科学</em>，<br>然后就可以生成部署一条龙直接带走了~</p><pre><code>$ hexo g -d</code></pre><h3 id="5、绑定自定义域名"><a href="#5、绑定自定义域名" class="headerlink" title="5、绑定自定义域名"></a>5、绑定自定义域名</h3><p>同样在设置页面，找到Domains配置，按提示操作就行了，比较简单。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero8.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="其他事项"><a href="#其他事项" class="headerlink" title="其他事项"></a>其他事项</h2><p>1、因为现在Heroku采用了和过去不同的验证方式，所以不能通过输入用户名和密码直接git，必须安装Heroku自己的CLI管理插件。详见官网说明如下：<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/hero9.jpg" srcset="/img/loading.gif" alt=""><br>2、虽然Heroku支持关联Github，实现动态更新部署，但是实测hexo生成的public文件夹不能才用这种方式部署。<br>3、Heroku为每一个项目免费提供二级域名，但是很不幸，会被腾讯QQ拦截，不过无伤大雅。</p><p>因为个人原因关闭了镜像站，所以访问速度还请大家自行测试。<br>更多问题可详见<a href="https://devcenter.heroku.com/" target="_blank" rel="noopener" title="官方文档">官方文档。</a><br>更多静态托管方式可参见<a href="/posts/19169.html" title="另一篇博文">另一篇博文</a></p><hr><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1]Hexo+NexT+Heroku十分钟免费博客建站教程 2016-10-29 <a href="https://segmentfault.com/a/1190000007321577" target="_blank" rel="noopener">https://segmentfault.com/a/1190000007321577</a></p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>教程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>可能是最全的静态托管平台收集</title>
+    <link href="/posts/19169.html"/>
+    <url>/posts/19169.html</url>
+    
+    <content type="html"><![CDATA[<!-- build time:Sun Jul 05 2020 07:52:49 GMT+0800 (Central Standard Time) --><p>静态博客，不需要服务器大动干戈，只要一个托管平台就解决问题。然而网上搜索，可供使用的平台并不多，以为资源匮乏，实际上只是你未曾了解而已。<a id="more"></a><br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/jingtaituoguan.jpg" srcset="/img/loading.gif" alt=""><br>今天，特地整理了使用过的诸多平台，分享一下。</p><hr><h3 id="1、GitHub-Pages"><a href="#1、GitHub-Pages" class="headerlink" title="1、GitHub Pages"></a>1、GitHub Pages</h3><p>简介：全球最大的开源代码托管平台，现已被微软收购。<br>优缺点：稳定性强，支持Git部署、分支管理，使用方便。/半墙状态，访问速度比较一般。<br>服务器速度：美国 GitHub+Fastly节点，200ms左右，速度一般。<br><a class="btn" href="https://www.github.com" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="2、Gitee-Pages"><a href="#2、Gitee-Pages" class="headerlink" title="2、Gitee Pages"></a>2、Gitee Pages</h3><p>简介：国内版Github，全中文平台。<br>优缺点：稳定性强，国内服务器速度快。/自定义域名和自动部署需要收费。<br>服务器速度：国内节点，＜50ms，速度快。<br><a class="btn" href="https://gitee.com/" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="3、Coding-Pages"><a href="#3、Coding-Pages" class="headerlink" title="3、Coding Pages"></a>3、Coding Pages</h3><p>简介：企业化源码管理平台，现已被腾讯收购。<br>优缺点：仓库容量大，访问速度快。/时常宕机，稳定性较差，移动线路无法访问。<br>服务器速度：新加坡 腾讯云节点，＜100ms，速度快。<br><a class="btn" href="https://coding.net" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="4、NetLify"><a href="#4、NetLify" class="headerlink" title="4、NetLify"></a>4、NetLify</h3><p>简介：国外的静态网页发布平台。<br>优缺点：和Github关联，自动部署。无需繁琐设置，操作简单。/访问速度较慢。<br>服务器速度：美国节点，200ms左右，速度一般。<br><a class="btn" href="https://netlify.com" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="5、Zeit"><a href="#5、Zeit" class="headerlink" title="5、Zeit"></a>5、Zeit</h3><p>简介：国外的静态网页发布平台。<br>优缺点：和Github关联，自动部署。/需手动配置部分页面，如404。<br>服务器速度：台湾 谷歌云，＜100ms，速度快。<br><a class="btn" href="https://zeit.co" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="6、Fast"><a href="#6、Fast" class="headerlink" title="6、Fast"></a>6、Fast</h3><p>简介：国外的静态网页发布平台。<br>优缺点：和Github关联，自动部署。/免费用户无法设置自定义404页面。<br>服务器速度：美国 CF百度云节点，200ms左右，速度一般。<br><a class="btn" href="https://fast.io" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="7、wulihub"><a href="#7、wulihub" class="headerlink" title="7、wulihub"></a>7、wulihub</h3><p>简介：网盘式的静态页面托管平台。<br>优缺点：国内服务器，速度快。支持格式多。/对Hexo支持并不友好，无法自定义域名。建议用作单页测试。<br>服务器速度：山东阿里云节点，＜50ms，速度快。<br><a class="btn" href="https://www.wulihub.com.cn/" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="8、CloudFlare-Workers"><a href="#8、CloudFlare-Workers" class="headerlink" title="8、CloudFlare Workers"></a>8、CloudFlare Workers</h3><p>简介：也许算不上静态托管，但是也可以利用起来搭建博客引导页。<br>优缺点：多个单页HTML支持。/限制每日10w次访问请求。<br>服务器速度：CloudFlare节点，200ms左右，速度一般。<br><a class="btn" href="https://workers.cloudflare.com/" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="9、COS"><a href="#9、COS" class="headerlink" title="9、COS"></a>9、COS</h3><p>简介：对象储存。<br>优缺点：自助挑选服务商，速度快，费用低。<br>服务器速度：具体参照服务商。<br><a class="btn" href="url" title="没得链接">没得链接</a></p><h3 id="10、Clouding-Base"><a href="#10、Clouding-Base" class="headerlink" title="10、Clouding Base"></a>10、Clouding Base</h3><p>简介：腾讯云新推出的静态托管平台。<br>优缺点：活动期间9.9/年，便宜，速度快。/需备案和申请。<br>服务器速度：腾讯云国内节点，＜50ms，速度快。<br><a class="btn" href="https://cloud.tencent.com/document/product/876/" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><h3 id="11、Heroku"><a href="#11、Heroku" class="headerlink" title="11、Heroku"></a>11、Heroku</h3><p>详情见新博文。<br><a class="btn" href="/posts/29159.html" title="点击查看">点击查看</a></p><h3 id="12、Surge"><a href="#12、Surge" class="headerlink" title="12、Surge"></a>12、Surge</h3><p>简介：使用命令行远程管理的免费静态页面发布平台。美国digitalocean节点。<br><a class="btn" href="https://surge.sh/" target="_blank" rel="noopener" title="访问官网">访问官网</a></p><hr><p>欢迎在评论区留言补充哦！</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p><!-- rebuild by neat -->]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>收集</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>屏蔽举报按钮，解决推广烦恼</title>
+    <link href="/posts/39841.html"/>
+    <url>/posts/39841.html</url>
+    
+    <content type="html"><![CDATA[<p>有时候分享小站的文章，总是会被人莫名举报以致被腾讯屏蔽，站长身处被动，实在无奈。<a id="more"></a>不禁又回想起<a href="https://jimmyqin.cn/posts/55547.html" title="悲伤往事...">悲伤往事…</a><br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yincangjubao1.jpg" srcset="/img/loading.gif" alt=""></p><p>不过，最近发现了防止被举报的好方法，赶快记到小本本上来。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yincangjubao.png" srcset="/img/loading.gif" alt=""></p><hr><h2 id="隐藏QQ更多功能按钮"><a href="#隐藏QQ更多功能按钮" class="headerlink" title="隐藏QQ更多功能按钮"></a>隐藏QQ更多功能按钮</h2><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yincangjubao2.jpg" srcset="/img/loading.gif" alt=""><br>效果如图所示。<br>使用方法十分简单：在网址最后加上<code>?_wv=2</code>即可，<br>如：<a href="https://JimmyQin.cn?_wv=2">https://JimmyQin.cn?_wv=2</a></p><h2 id="在QQ中全屏打开"><a href="#在QQ中全屏打开" class="headerlink" title="在QQ中全屏打开"></a>在QQ中全屏打开</h2><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yincangjubao3.jpg" srcset="/img/loading.gif" alt=""><br>使用同样的方法，不过代码有区别<br>添加<code>_wv=16777223&amp;_bid=3354</code>，<br>如<a href="https://JimmyQin.cn?_wv=16777223&amp;_bid=3354">https://JimmyQin.cn?_wv=16777223&amp;_bid=3354</a></p><h2 id="微信呢？"><a href="#微信呢？" class="headerlink" title="微信呢？"></a>微信呢？</h2><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yincangjubao4.jpg" srcset="/img/loading.gif" alt=""><br>经过测试，因为微信自动识别主域名，所有这个方法对微信无效。</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>HTML</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>超有意思的在线生成器</title>
+    <link href="/posts/34653.html"/>
+    <url>/posts/34653.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>嘻，技亦灵怪矣哉！</p></blockquote><a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/shengchengqi.png" srcset="/img/loading.gif" alt=""></p><p>近日于社区浏览，忽见新奇开源项目一二。<br>点击测试，着实令人捧腹不禁，遂作分享。</p><p>在这里就不上图和详细介绍了，亲自体验就好……</p><h2 id="抽象话生成器"><a href="#抽象话生成器" class="headerlink" title="抽象话生成器"></a>抽象话生成器</h2><p>抽象交流就靠它🐮<br><a class="btn" href="https://aipaideer.github.io/tool/cxh" target="_blank" title="走你">尝试抽象</a><br>源码来自<a href="https://github.com/chenxuuu/chouxianghua" target="_blank" rel="noopener">https://github.com/chenxuuu/chouxianghua</a></p><h2 id="营销号生成器"><a href="#营销号生成器" class="headerlink" title="营销号生成器"></a>营销号生成器</h2><p>营销金句不用愁🙈<br><a class="btn" href="https://aipaideer.github.io/tool/yxh" target="_blank" title="走你">开始营销</a><br>源码来自<a href="https://gitee.com/kaseidis/interesting_gadgets/tree/master/marketing_generator" target="_blank" rel="noopener">https://gitee.com/kaseidis/interesting_gadgets/tree/master/marketing_generator</a></p><h2 id="论文生成器"><a href="#论文生成器" class="headerlink" title="论文生成器"></a>论文生成器</h2><p>才思泉涌秒成文🌏<br><a class="btn" href="https://aipaideer.github.io/tool/article" target="_blank" title="走你">现在创作</a><br>源码来自<a href="https://github.com/suulnnka/BullshitGenerator" target="_blank" rel="noopener">https://github.com/suulnnka/BullshitGenerator</a></p><hr><p>慢收集，慢更新……</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end3.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>收集</tag>
+      
+      <tag>好玩的</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>全机型MIUI12超级壁纸分享</title>
+    <link href="/posts/37069.html"/>
+    <url>/posts/37069.html</url>
+    
+    <content type="html"><![CDATA[<h2 id="MIUI12超级壁纸全机型使用分享"><a href="#MIUI12超级壁纸全机型使用分享" class="headerlink" title="MIUI12超级壁纸全机型使用分享"></a>MIUI12超级壁纸全机型使用分享</h2> <a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/chaojibizhi1.jpg" srcset="/img/loading.gif" alt=""><br>前两天MIUI12发布，全新动效惊艳全场，我也第一时间升级了系统，亲自体验一番。更新的细节很多，但最引人注目的，我认为是“超级壁纸”这个功能了吧。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/chaojibizhi2.png" srcset="/img/loading.gif" alt=""><br>MIUI把息屏-锁屏-桌面这三个场景通过动态壁纸串连了起来，好像隐喻了空间纵深的前进和后退。整体体验下来灵动自然，十分有特色。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/chaojibizhi3.webp" srcset="/img/loading.gif" alt=""></p><blockquote><p>[图源：爱范儿]</p></blockquote><p>有没有心动想亲自上手试试呢？<br>但是，注意到MIUI官网的注释，超级壁纸只能在少数旗舰机型上使用。<br><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/chaojibizhi4.jpg" srcset="/img/loading.gif" alt=""></p><p>虽然，运行MIUI12的老机型也可以通过创建超级壁纸APP的Activity来使用，然而卡顿和BUG实在影响体验。<br>不过不要紧，今天分享一个体验超级壁纸的新方法！那就是：</p><h2 id="超级壁纸动态壁纸移植版"><a href="#超级壁纸动态壁纸移植版" class="headerlink" title="超级壁纸动态壁纸移植版"></a>超级壁纸动态壁纸移植版</h2><p>MIUI12原版超级壁纸，是通过 <em>Unity3D</em> 建模实现，势必对手机性能要求极高。<br>而昨天，有机友通过 <em>视频壁纸</em> 的方式，客制了一版超级壁纸。从锁屏到桌面，虽然效果不及原版，但却给体验提供了一种简单的方式。<br>最重要的是，不仅对性能要求很低，而且<strong>全安卓机型通用</strong>，实在大快人心。<br>另外，在这里也提供一份原版超级壁纸，破解了机型限制，同样推荐使用。</p><hr><h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><p>内含超级壁纸火星+地球（双场景，配置要求低）<br>提取码：<code>njzy</code><br><a class="btn waves-effect waves-light" href="https://njzybaby.lanzous.com/b07rjxwva" target="_blank" rel="noopener" title="点点我"><i class="fas fa-cloud-download-alt"></i>下载</a></p><p>原版超级壁纸破解机型限制（可选地点，配置要求高）<br><a class="btn waves-effect waves-light" href="https://lanzous.com/b00njr8mf" target="_blank" rel="noopener" title="点点点我"><i class="fas fa-cloud-download-alt"></i>下载</a></p><hr><blockquote><p>软件来源：微信公众号@宁静之雨 / 微博@请叫我马少</p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>分享</tag>
+      
+      <tag>安卓软件</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>全新域名，全新起点</title>
+    <link href="/posts/53779.html"/>
+    <url>/posts/53779.html</url>
+    
+    <content type="html"><![CDATA[<h2 id="小博客大事记"><a href="#小博客大事记" class="headerlink" title="小博客大事记"></a>小博客大事记</h2><p>今日小站正式更换域名为<code>JimmyQin.cn</code></p><a id="more"></a><p>相信这个域名可以伴随着Blog一直用下去了。<br>原域名<strong><em>apde.xyz</em></strong> 在今年内仍可正常访问。</p><p>另外，还给建了个博客引导页<code>www.apde.workers.dev</code>也是长期可用的。</p><hr><p>已经完成相关文件域名更改，只是原文章阅读统计和网站访问统计数据没有了，<br>算是有点小遗憾吧……</p><hr><p>欢迎各位朋友持续关注本站更新哟~</p><p>：）</p><p>JimmyQin</p><p>————2020.4.26</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>建站纪念</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>在线Markdown编辑器嵌入教程</title>
+    <link href="/posts/30496.html"/>
+    <url>/posts/30496.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>给自己的博客加一个在线Markdown编辑器，会莫名有一种在家安心创作的踏实感</p></blockquote><a id="more"></a><p>李商隐作《李贺小传》中有记载：“<em>恒从小奚奴，骑巨驴，背一古锦囊，遇有所得，即书投囊中……</em>”说的是唐代大诗人李贺，出行时必背上锦囊，文思泉涌时便赶紧记下投到囊中。且不说爱诗心切，这骑驴写字倒是颇有难度。<br>千百年过去，如今，当你我灵感忽现，只需打开电脑拿起手机。而对博主们来说，Markdown语言+在线编辑器，更是完美的写作体验。<a href="/editor/" title="（可以到本博客的 写作 页面体验~）">（可以到本博客的 写作 页面体验~）</a></p><hr><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/editormd01.jpg" srcset="/img/loading.gif" alt=""><br>前段时间百度的时候，发现一款十分好用的Markdown在线编辑器——<code>Editor.md</code>，并且开源，若是嵌入博客，岂不美哉？</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/editormd.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h2><h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>本教程参考Editor.md官网的Simple example进行搭建，实现基础功能。更多详细信息，请访问<a href="https://pandao.github.io/editor.md/index.html" target="_blank" rel="noopener" title="Editor.md官网">Editor.md官网</a>查看。</p><h3 id="引入js-css及配置"><a href="#引入js-css及配置" class="headerlink" title="引入js/css及配置"></a>引入js/css及配置</h3><p>在需要嵌入编辑器的页面加入以下代码</p><pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;editormd/css/editormd.css&quot; /&gt;&lt;div id=&quot;test-editor&quot;&gt;    &lt;textarea style=&quot;display:none;&quot;&gt;### 关于 Editor.md**Editor.md** 是一款开源的、可嵌入的 Markdown 在线编辑器（组件），基于 CodeMirror、jQuery 和 Marked 构建。    &lt;/textarea&gt;&lt;/div&gt;&lt;script src=&quot;https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;editormd/editormd.min.js&quot;&gt;&lt;/script&gt;&lt;script type=&quot;text/javascript&quot;&gt;    $(function() {        var editor = editormd(&quot;test-editor&quot;, {            // width  : &quot;100%&quot;,            // height : &quot;100%&quot;,            path   : &quot;editormd/lib/&quot;        });    });&lt;/script&gt;</code></pre><p>本着尽量简单的理念，可以直接引用jsdelivr公共CDN中的js和css。</p><pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/editor.md@1.5.0/css/editormd.min.css&quot; /&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/editor.md@1.5.0/editormd.min.js&quot;&gt;&lt;/script&gt;</code></pre><p>分别替换以上对应css和js即可</p><h3 id="载入相关lib-plugin"><a href="#载入相关lib-plugin" class="headerlink" title="载入相关lib/plugin"></a>载入相关lib/plugin</h3><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/editormd02.jpg" srcset="/img/loading.gif" alt=""><br>来到Editor.md的github页面clone最新版本的源码，将其中的<code>lib</code>和<code>plugins</code>文件夹解压，并放到网站文件目录/editormd下。</p><h2 id="配置属性"><a href="#配置属性" class="headerlink" title="配置属性"></a>配置属性</h2><p>如：<br>height : “100%”,    //编辑器高度<br>path : “./lib/“,      //根据你的文件目录修改<br>等等<br>更多配置属性，请移步github的readme。</p><p>到这里，一个简单的MD在线编辑器就基本上嵌入成功啦！</p><h2 id="小问题"><a href="#小问题" class="headerlink" title="小问题"></a>小问题</h2><h3 id="1-点击功能按钮无效"><a href="#1-点击功能按钮无效" class="headerlink" title="1. 点击功能按钮无效"></a>1. 点击功能按钮无效</h3><p>比如点击插入图片按钮无法弹出对话框，控制台报错。这是由于插件没有启用的缘故。检查一下你的<code>plugins</code>目录有没有成功上传。</p><h3 id="2-emoji表情无法显示"><a href="#2-emoji表情无法显示" class="headerlink" title="2. emoji表情无法显示"></a>2. emoji表情无法显示</h3><p>将emoji表情下载并上传到服务器，修改emoji-dialog.js文件的指向就好了。（我觉得不太常用就没启用）</p><h3 id="3-移动端输入时，光标上漂移"><a href="#3-移动端输入时，光标上漂移" class="headerlink" title="3. 移动端输入时，光标上漂移"></a>3. 移动端输入时，光标上漂移</h3><p>看到github上好多人提issue，至今也没有更新代码解决。（作者弃坑）<br>其实是老版本<code>CodeMirror</code>的BUG，下载最新版的codemirror替换掉lib文件夹里原来的旧版本codemirror就行了。</p><h3 id="4-编辑栏行号重叠"><a href="#4-编辑栏行号重叠" class="headerlink" title="4. 编辑栏行号重叠"></a>4. 编辑栏行号重叠</h3><p>因为使用原版CodeMirror所以相关css没有针对editormd进行适配，会导致编辑区域行号重叠。<br>找到<code>/editormd/lib/codemirror/codemirror.min.css</code>里面的<code>.CodeMirror-linenumber{padding:0 3px 0 5px;min-width:20px;</code> 将min-width改成23px以上解决。</p><h2 id="没了"><a href="#没了" class="headerlink" title="没了"></a>没了</h2><p>现在，真的可以正常使用了（虽然还是可能有bug）。<br>很奇怪这么好的开源软件，竟然有好几年没有正式维护了。也不知道作者跑去了哪里。原来百度搜索markdown，这款编辑器排名显示还非常靠前，现在，那个地址也重定向到别的网站去了。</p><hr><p>虽然写作是越来越方便，但是……<br>坐着敲半天字，还真是挺累的啊。</p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>[1]ThinkCMF整合Editor.md编辑器挖坑补坑指南 2019-02-26 <a href="https://www.cyqsd.cn/8039.html" target="_blank" rel="noopener">https://www.cyqsd.cn/8039.html</a><br>[2]editormd使用教程 2017-01-21 <a href="https://www.cnblogs.com/liujiaxian/p/6336841.html" target="_blank" rel="noopener">https://www.cnblogs.com/liujiaxian/p/6336841.html</a></p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>教程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>常用语言注释小收集</title>
+    <link href="/posts/61402.html"/>
+    <url>/posts/61402.html</url>
+    
+    <content type="html"><![CDATA[<p>作为一个熟练掌握(<del>唱跳Rap篮球</del>)Ctrl+C+V大法编程的programmer，<a id="more"></a>看懂代码前还是先看懂注释比较重要。<br>这里整理了一些常用语言注释标志，来源于挨个百度。持续更新，如有错误欢迎指正。</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/codenote.jpg" srcset="/img/loading.gif" alt=""></p><h3 id="JavaScript："><a href="#JavaScript：" class="headerlink" title="JavaScript："></a>JavaScript：</h3><p>1、//…… 单行注释<br>2、/<em>……</em>/ 多行注释</p><hr><h3 id="CSS："><a href="#CSS：" class="headerlink" title="CSS："></a>CSS：</h3><p>/<em>注释内容</em>/</p><hr><h3 id="HTML："><a href="#HTML：" class="headerlink" title="HTML："></a>HTML：</h3><p>[!–注释内容–)] (防止HTML渲染，方括号”[“应改为尖括号”&lt;” )</p><hr><h3 id="C、C"><a href="#C、C" class="headerlink" title="C、C++:"></a>C、C++:</h3><p>1、//…… 单行注释<br>2、/<em>……</em>/ 多行注释<br>3、#if 0</p><p>　　  我是注释1<br>　　  我是注释2<br>　　  我是注释3<br>    “#endif（防止Markdown渲染，注意去掉井号前”）</p><hr><h3 id="MySQL："><a href="#MySQL：" class="headerlink" title="MySQL："></a>MySQL：</h3><p>1、#…… 单行注释<br>2、- …… 单行注释（注意是两杆且要加空格）<br>3、/<em>……</em>/ 多行注释</p><hr><h3 id="SQLServer："><a href="#SQLServer：" class="headerlink" title="SQLServer："></a>SQLServer：</h3><p>1、-…… 单行注释（注意是两杆且不必加空格）<br>2、/<em>……</em>/ 多行注释</p><hr><h3 id="PHP："><a href="#PHP：" class="headerlink" title="PHP："></a>PHP：</h3><p>1、//…… 单行注释<br>2、/<em>……</em>/ 多行注释</p><hr><h3 id="Java："><a href="#Java：" class="headerlink" title="Java："></a>Java：</h3><p>1、//…… 单行注释<br>2、/<em>……</em>/ 多行注释<br>3、/<em>*……</em>/文档注释</p><hr><h3 id="易语言："><a href="#易语言：" class="headerlink" title="易语言："></a>易语言：</h3><p>’（中文单回引）</p><hr><p>陆续收集中……</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>收集</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>礼物</title>
+    <link href="/posts/18260.html"/>
+    <url>/posts/18260.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>他和她分手了，虽然很舍不得<br> <a id="more"></a></p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/gift.jpg" srcset="/img/loading.gif" alt=""></p><p>他和蓝分手了，虽然他很舍不得和蓝分手。蓝是个很好的女孩儿，很漂亮也很温柔，虽然很多朋友说他离开她很傻，可他还是放手了，虽然他很舍不得。</p><p>第一天。她没有起床，把自己用被子捂得严严实实的，她宿舍的人都不敢去安慰她，她一天都没有吃饭，连刷牙洗脸都没有，晚上睡觉的时候听到她在被子里哭泣。</p><p>第二天。今天她吃饭了，是她舍友强制性让她吃的。她的眼眶红红的，他总说她是个爱哭鬼，她每次都撅着小嘴说她不是。</p><p>第三天。今天她穿的很妖艳，走近一家酒吧，喝了好多酒，用一种很具诱惑力的眼光环视全场，好多人上来搭腔“小姐，你好漂亮啊。”她喝了很多，当一个年纪可以做她爸爸的男人对她说“小姐，我送你回家吧”的时候，她把手中的酒全泼在他的脸上，那个该死的老头扬起他的手掌就要打下去的时候，小睦来了，救了蓝。这一切他都知道，他就在酒吧的一个角落里看着。</p><p>第四天。她今天早早就起床了，忙忙碌碌了一上午，然后把自己关在浴室里好久，当舍友们踹门进去的时候都惊呼道：“好干净啊！”</p><p>第五天。她开始学习了，其实她原来学习很好，他们开始后受他的影响她的成绩也退步了，这样也好，转移一下注意力，恢复得也快。</p><p>三个月后。她成了学生会主席，越来越能干，也开朗了不少。马上就要考研了。</p><p>一年后。在她身边的男生很多，比他优秀的也很多，可她根本没在意过，不过她和凌关系很好，校园里谣传他们的关系很暧昧。她说只是把他当哥哥，可流言是挡不住的。</p><p>三年后。她要结婚了，新郎是凌，她在写结婚请帖，一张，两张，三张……，写到第十二张的时候她哭了，趴在桌子上眼泪完全抑制不住，他上前一看，所有的喜帖上新郎写的都是他的名字。</p><p>他也很想哭，可是鬼魂是不能哭的。他没有眼泪……</p><p>三年前，他横穿马路，路上车祸，手里提着要给她庆祝生日的<del>iPhone 11 Pro Max 512G版</del>(划掉) 。</p><p><strong>End/完</strong></p><hr><p>本文为转载作品<br>文章版权归原作者所有</p><p>原作者： 北大未名@dampire<br>改编：佚名<br>编辑： JimmyQin（挨拍的儿）</p><hr><blockquote><p>说来有趣，初读这篇小说，是在某论坛看到的神评论。本来满是感动，却被结局植入广告吓得不轻。故事情节精炼，且作分享。而为了找到原作者，我用了多个搜索引擎反复查寻，发现了很多改编过后的版本，甚至出现了双语版、剧本版等等。最终，定位最早的发表时间是2003年在北大未名BBS找到的一篇帖子，可惜楼主已注销账号。后在2005年，又有改编版本发表在《现代语文》杂志上。</p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end3.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>转载</tag>
+      
+      <tag>小说</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>(手动置顶)通知</title>
+    <link href="/posts/6210.html"/>
+    <url>/posts/6210.html</url>
+    
+    <content type="html"><![CDATA[<p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/tinggeng.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="通知"><a href="#通知" class="headerlink" title="通知"></a>通知</h2><p>因为疫情好转，复工复学，学习任务加重，不能及时更新博客和互换友链，请多多包涵！<br>可能会时不时更新2333……</p><p>：）</p><p>JimmyQin</p><p>————2020.3.11</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>通知</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>北冥有人，其名为坤</title>
+    <link href="/posts/36910.html"/>
+    <url>/posts/36910.html</url>
+    
+    <content type="html"><![CDATA[<h3 id="北冥有人，其名为坤"><a href="#北冥有人，其名为坤" class="headerlink" title="北冥有人，其名为坤"></a>北冥有人，其名为坤</h3><hr><blockquote><p>其实，我还是很喜欢蔡徐坤的……<del>(迫真)</del></p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/kun.jpg" srcset="/img/loading.gif" alt=""></p><a id="more"></a><h4 id="因何而爱"><a href="#因何而爱" class="headerlink" title="因何而爱"></a>因何而爱</h4><hr><p>单曲《<del>(鸡)</del>只因你太美》，一鸣惊人，爆红网络。给我们带来欢乐，延续至今。<br>接连力作《喂 喂 喂》，源自心底的呐喊，更见搞笑实力。于捧腹间感受认真态度。<br>更别说诸多鬼畜素材，早已深入人心……</p><h4 id="何以见爱"><a href="#何以见爱" class="headerlink" title="何以见爱"></a>何以见爱</h4><hr><h5 id="坤坤来电"><a href="#坤坤来电" class="headerlink" title="坤坤来电"></a>坤坤来电</h5><p>QQ上经常收到好友发来神秘链接，点开就是XX恶搞来电。我也在网上扒了素材，改了一个坤坤来电。没什么技术含量，权当娱乐。</p><p><a class="btn waves-effect waves-light" href="https://aipaideer.github.io/kun/" target="_blank" rel="noopener" title="点点看"><i class="fas fa-check-circle"></i>效果测试</a> | <a class="btn waves-effect waves-light" href="https://github.com/aipaideer/kun" target="_blank" rel="noopener" title="再点点看"><i class="fas fa-cloud-download-alt"></i>源码下载</a></p><p>PS：可以拿来做引流页面，配合XML发在QQ效果突出。不过很容易导致网站被封，详情<a href="/posts/55547.html" title="另一篇博文">另一篇博文</a>。</p><hr><h5 id="坤坤铃声"><a href="#坤坤铃声" class="headerlink" title="坤坤铃声"></a>坤坤铃声</h5><p>原版只因你太美视频中的背景音乐音质实在太差了，奈何网上竟然搜不到原版伴奏。后来发现，其实是《B-DAY》和《只因你太美》两首歌拼在一起的，那就干脆重新剪辑一波，来一个高品质重制。<br>拿来当闹钟，再也不怕起不来了；拿来当手机铃声，人群中尽显优雅品味……<br>提取码：b74t</p><p><a class="btn waves-effect waves-light" href="https://pan.baidu.com/s/1d_s0vLl79sI9sxRbkrrJgQ" target="_blank" rel="noopener" title="又点点看"><i class="fas fa-cloud-download-alt"></i>音频下载</a></p><hr><p>没了，接着守护最好的坤坤吧<del>（呕）</del></p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>分享</tag>
+      
+      <tag>源码</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>“awsl”是哪条HTML代码？nbsp=“牛x视频”？</title>
+    <link href="/posts/12540.html"/>
+    <url>/posts/12540.html</url>
+    
+    <content type="html"><![CDATA[<p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/nbsp.jpg" srcset="/img/loading.gif" alt=""></p><blockquote><p>原来，我就是那个一直不明白网络拼音缩写的含义，同时在HTML里狂按空格的人……</p></blockquote><a id="more"></a><hr><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>前一段时间，学习了网络流行词缩写大全，才算搞懂了弹幕里边一堆“awsl”是表达发自内心的赞美和感叹，而不是沉痛悼念阿伟先生的意思……<br><del>可能这就是村通网吧</del><br>最近，发现自己建站基础知识严重不足，看到“nbsp”又以为是什么新词出现了。那就借此机会，整理一下HTML里空格的用法吧！<br><img src="https://i.niupic.com/images/2020/03/05/6Y5J.jpg" srcset="/img/loading.gif" alt=""></p><h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><h4 id="HTML中nbps和空格的区别"><a href="#HTML中nbps和空格的区别" class="headerlink" title="HTML中nbps和空格的区别"></a>HTML中nbps和空格的区别</h4><hr><p>在html代码中每输入一个转义字符&amp;nbsp就表示一个空格，输入十个&amp;nbsp，页面中就显示10个空格位置。<br>而在html代码中输入空格，<strong>不管输入多少个空格</strong>，最终在页面中显示的空格位置只有一个。<br>效果区别如下：</p><p><img src="https://i.niupic.com/images/2020/03/04/6XOJ.jpg" srcset="/img/loading.gif" alt=""></p><h4 id="HTML中6种空格标记"><a href="#HTML中6种空格标记" class="headerlink" title="HTML中6种空格标记"></a>HTML中6种空格标记</h4><hr><p>这是在cnblog上找到一个直观的比较</p><pre><code>&lt;!DOCTYPE html&gt;&lt;html&gt;    &lt;head&gt;        &lt;meta charset=&quot;utf-8&quot;&gt;        &lt;title&gt;HTML中的&amp; nbsp; &amp; ensp; &amp; emsp;等6种空格标记&lt;/title&gt;        &lt;style type=&quot;text/css&quot;&gt;            *{                margin: 0 auto;            }            body{                margin: 15vh 0;            }            button{                /* font-family: &quot;仿宋&quot;; */                display: block;                height: 18vw;                width: 70vw;                border-radius: 50px;                outline: none;                font-size: 3rem;                color: #fff;            }        &lt;/style&gt;    &lt;/head&gt;    &lt;body&gt;        &lt;!-- &amp;nbsp; 不会累加的（只算1个），且该空格占据宽度受【字体】影响明显而强烈 --&gt;        &lt;button type=&quot;button&quot;&gt;提&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;交&lt;/button&gt;&lt;br /&gt;        &lt;!-- &amp;ensp; 占据的宽度正好是1/2个中文宽度，且基本上不受字体影响 --&gt;        &lt;button type=&quot;button&quot;&gt;提&amp;ensp;&amp;ensp;交&lt;/button&gt;&lt;br /&gt;        &lt;!-- &amp;emsp; 占据的宽度正好是1个中文宽度，且基本上不受字体影响 --&gt;        &lt;button type=&quot;button&quot;&gt;提&amp;emsp;交&lt;/button&gt;&lt;br /&gt;        &lt;!-- &amp;thinsp; 占据的宽度比较小，它是em之六分之一宽 --&gt;        &lt;button type=&quot;button&quot;&gt;提&amp;thinsp;&amp;thinsp;&amp;thinsp;&amp;thinsp;&amp;thinsp;&amp;thinsp;交&lt;/button&gt;&lt;br /&gt;        &lt;!-- &amp;zwnj; （零宽不连字）是一个不打印字符，放在电子文本的两个字符之间，抑制本来会发生的连字，        而是以这两个字符原本的字形来绘制 --&gt;        &lt;!-- &amp;zwj; （零宽连字）是一个不打印字符，放在某些需要复杂排版语言（如阿拉伯语、印地语）的两个字符之间，        使得这两个本不会发生连字的字符产生了连字效果 --&gt;    &lt;/body&gt;&lt;/html&gt;</code></pre><p>默认效果显示：<br><img src="https://i.niupic.com/images/2020/03/04/6XPE.png" srcset="/img/loading.gif" alt=""><br>添加字体后效果显示：<br><img src="https://i.niupic.com/images/2020/03/04/6XPF.png" srcset="/img/loading.gif" alt=""></p><hr><p>新手上路，学海无涯<br>先一点点积累吧~</p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a><strong>参考资料</strong></h2><p>[1]HTML中的空格标记 2019-05-10 <a href="https://www.cnblogs.com/Salicejy/p/css.html" target="_blank" rel="noopener">https://www.cnblogs.com/Salicejy/p/css.html</a></p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>HTML</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>宅家学习护眼攻略</title>
+    <link href="/posts/46162.html"/>
+    <url>/posts/46162.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>迫于当前“停课不停学”的形势，宅家学习是你现在的状态吗？每日窥屏十余小时，怎样才能呵护好咱娇嫩的明眸呢？<br> <a id="more"></a></p></blockquote><p> <img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/eye.png" srcset="/img/loading.gif" alt=""></p><hr><p>“双瞳如小窗,佳景观历历”这句广告宣传语一直令我记忆犹新。</p><p>爱护眼睛是老生常谈的话题，这段时间，受疫情影响而不得不采取的网课学习方式，又让眼睛成了矛盾冲突的受害者。连朝接夕地使用电脑和手机学习和工作，难免让双眼有些疲劳。如何以一种更加舒适的状态进行学习，更会是提高效率的一大保证。</p><p>眼前的屏幕其实可以更加体贴，你需要的，只是一款合适的护眼软件！</p><h3 id="手机端"><a href="#手机端" class="headerlink" title="手机端"></a>手机端</h3><hr><h4 id="·-系统自带护眼模式"><a href="#·-系统自带护眼模式" class="headerlink" title="· 系统自带护眼模式"></a>· 系统自带护眼模式</h4><p><img src="https://i.niupic.com/images/2020/03/01/6XiK.jpg" srcset="/img/loading.gif" alt=""><br>系统自带当然是首选，<br>如</p><ul><li>MIUI——显示设置——护眼模式</li><li>iOS——Night Shift</li><li>等等……</li></ul><p>如果没有找到，请接着往下看</p><h4 id="·-夜间屏幕"><a href="#·-夜间屏幕" class="headerlink" title="· 夜间屏幕"></a>· 夜间屏幕</h4><p><img src="https://i.niupic.com/images/2020/03/01/6XiL.jpg" srcset="/img/loading.gif" alt=""></p><p>强势推荐这款护眼APP！</p><p><img src="https://i.niupic.com/images/2020/03/01/6XiM.jpg" srcset="/img/loading.gif" alt=""></p><p>仅仅300kb+的体积，体验丝滑流畅。亮度调节，蓝光过滤，一应俱全。轻巧简洁，专注护眼，值得一试哦。<br><a href="https://www.coolapk.com/apk/info.papdt.blackblub" target="_blank" rel="noopener" title="下载链接">下载链接</a></p><h3 id="桌面端"><a href="#桌面端" class="headerlink" title="桌面端"></a>桌面端</h3><hr><p>电脑端选择就更多了，但是大部分护眼软件都十分冗杂，甚至带有广告。但不得不说，漫淘应用，总有精品值得推荐。</p><h4 id="·-f-lux"><a href="#·-f-lux" class="headerlink" title="· f.lux"></a>· f.lux</h4><p>software to make your life better ——这是软件官网的描述<br><img src="https://justgetflux.com/images/flux-windows.jpg" srcset="/img/loading.gif" alt=""><br>f.lux是一款非常专业的护眼软件，特点是可以精确调节色温，更可以根据经纬度确定自动开启护眼时间，很贴心啊！<br><a href="https://justgetflux.com" target="_blank" rel="noopener" title="官网链接">官网链接</a></p><h4 id="·-360眼睛卫士"><a href="#·-360眼睛卫士" class="headerlink" title="· 360眼睛卫士"></a>· 360眼睛卫士</h4><p>没错还是那个360!</p><p><img src="https://i.niupic.com/images/2020/03/01/6XiU.jpg" srcset="/img/loading.gif" alt=""></p><hr><p><img src="https://i.niupic.com/images/2020/03/01/6XiW.jpg" srcset="/img/loading.gif" alt=""></p><p>这是360很早在安全卫士中集成的小功能，但版本迭代后就删除了。<br>这个提取版功能简单，专门针对Word等办公软件优化背景颜色。清新的绿色，码字再也不会那么累了！<br>软件体积很小，原理是修改注册表，无后门，安心用。<br><a href="https://www.onlinedown.net/soft/975570.htm" target="_blank" rel="noopener" title="下载链接">下载链接</a></p><hr><p>PS.Windows10在近几个更新中也加入护眼模式，这里就不再赘述了。</p><hr><p>希望大家视力一直保持健康良好哦 ~</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end3.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>分享</tag>
+      
+      <tag>软件</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>疫情之下，震撼发声</title>
+    <link href="/posts/32323.html"/>
+    <url>/posts/32323.html</url>
+    
+    <content type="html"><![CDATA[<h3 id="疫情之下，震撼发声"><a href="#疫情之下，震撼发声" class="headerlink" title="疫情之下，震撼发声"></a>疫情之下，震撼发声</h3> <a id="more"></a><hr><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/yiqing.jpg" srcset="/img/loading.gif" alt=""></p><blockquote><p>写在前面的话<br>作为一名普通的中国公民<br>我深爱着我的祖国<br>所以当我看到<br>日益严峻的疫情使得<br>我们的国家和数亿同胞深受其害<br>让我感到心痛<br>我希望可以尽上自己的<br>一份绵薄之力<br>却不知该从何入手<br>我想到了或许语言<br>可以让我们重新燃起希望和信心<br>可以给我们继续战斗下去的勇气<br>所以我创作了这篇英文演讲稿<br>并且制作了演讲视频<br>为什么要用英文来写？<br>因为我希望不仅可以让国人同胞看到<br>也可以让其他国家那些关心我们、帮助我们，<br>甚至对此刻的中国不怀好意的人看到<br>我们有必胜的精神、历史和决心！<br>如果这些文字可以给你带来<br>哪怕一点点的感动和鼓舞<br>我觉得就足够了<br>也希望你可以将这篇演讲稿<br>传播给更多的人<br>让我们共同携手、共同战斗<br>一起赢得这场没有硝烟的战争吧！<br>正如王毅外长前几日<br>在慕尼黑安全会议上所说：<br>黎明，正在到来；<br>曙光，就在前方。<br>Dawn is breaking and<br>we are seeing light coming through.</p></blockquote><p><img src="https://i.niupic.com/images/2020/03/03/6XIx.jpg" srcset="/img/loading.gif" alt=""></p><p>We Are All Fighters<br>《我们都是战士》<br>作者：Jessica Liu<br>This is a war without smoke,<br>这是一场没有硝烟的战争<br>and we are all fighters.<br>而我们都是战士！<br>To the fighters<br>致敬所有的战士们！<br>We are facing a dark time right now.<br>我们正面临着黑暗时刻<br>Some of us are stuck at home<br>我们中有些人不得不禁足在家<br>Some are stuck far away from home<br>有些人不得不滞留他乡<br>Some of us have lost their jobs，<br>我们中有人失去了工作<br>Some have to shut down their businesses<br>有人关停了赖以为生的生意</p><p>Some of us are cutting down the expenses<br>我们中有人不得不节衣缩食<br>Some can’t even pay their rent and bills<br>有人甚至已经无力支付房租和账单<br>Some can’t go back to school<br>我们中有人无法回到学校<br>Some can’t get back to their jobs<br>有人无法回到工作岗位<br>And some of us are still working day and night,<br>我们中有人必须日夜坚守<br>no matter how exhausted they are<br>无论多么疲惫<br>Or how dangerous it is.<br>抑或面临多大的危险</p><p>Some of us have become infected.<br>我们中有人不幸被感染<br>They are isolated from<br>their families, their loved ones,<br>他们不得不离开家人和所爱之人<br>and have to be alone in the wards,<br>独自在病房面对恐惧<br>Or even worse,<br>更遭的是<br>it is their children,their parents,<br>or loved ones that are infected<br>被感染的是他们的孩子、父母或者爱人<br>and they don’t even<br>have a chance to say goodbye<br>他们甚至来不及当面道别</p><p>The virus is rampaging<br>病毒在大行肆虐<br>The numbers are increasing<br>感染人数在不断增加<br>The rumors are spreading<br>谣言四起<br>The fear is growing<br>恐惧弥漫<br>It seems that all of a sudden<br>似乎整个国家都在一瞬间<br>the whole country lost its vitality and prosperity.<br>失去了往日的活力和繁华</p><p>You are not the only one who is worrying,<br>你不是一个人在担忧<br>you are not the only one who is fearing,<br>你不是一个人在恐惧<br>You are not the only one who is struggling<br>你不是一个人在苦苦支撑<br>We are all facing a dark time right now,<br>我们都在面临一个黑暗时刻<br>Our whole country is facing a dark time right now.<br>整个国家都在面临一个黑暗时刻</p><p>This is a war!<br>这是一场战争！<br>It’s a war without guns, bombs, or smoke<br>这是一场没有枪、没有炮、没有硝烟的战争<br>But it’s a war with virus, doubts,<br>fears, rumors, and discrimination.<br>但这是一场与病毒、怀疑、<br>恐惧、谣言和歧视的战争<br>But we shall all be fighters, my dear fellows!<br>但我们都应该成为战士，我亲爱的同胞们！<br>Not just the doctors, the nurses, the policemen<br>and the scientists who should fight<br>不仅仅只有医生、护士、警察和科学家应该战斗<br>All of us should be the fighters in this war<br>我们都应该成为这场战争中的战士<br>We shall fight against fear<br>我们应该和恐惧斗争<br>We shall fight against uncertainty<br>我们应该和未知斗争<br>We shall fight against doubts<br>我们应该和怀疑斗争<br>We shall fight against selfishness<br>我们应该和自私斗争<br>We shall fight against rumors<br>我们应该和谣言斗争<br>We shall fight against discrimination<br>我们应该和歧视斗争</p><p>This is going to be a fierce and cruel war<br>这将会是一场激烈的严酷的战争<br>But don’t be afraid,<br>但是不用害怕<br>We’re going to win this war together in the end!<br>我们终将取得这场战争的胜利<br>Our people may get sick,<br>我们的人民可能生病<br>our city may get sick,<br>我们的城市可能生病<br>but we as a brave nation<br>但我们作为一个勇敢的民族<br>will never ever get sick<br>绝不会被病毒打倒<br>Because we have the spirit,<br>history and determination to win.<br>因为我们拥有必胜的精神、历史和决心！</p><p>We’ve been on this planet for over 5000 years.<br>我们在地球上已经屹立了5000多年<br>We’ve witnessed much darker moments<br>我们见证过更加黑暗的时刻<br>We’ve been though much crueler trials<br>我们经历过更加残酷的考验<br>No matter it’s the war, invasion, starvation,<br>无论是战争、侵略、饥饿、<br>poverty or natural disasters<br>贫穷还是自然灾害<br>We’ve always survived and<br>我们总是能幸存下来<br>We’ve always stood back up on our feet<br>我们总是能重新站立起来<br>We’ve always won in the end.<br>我们总是能取得最后的胜利<br>And we will definitely win this time.<br>所以这次我们也一定能赢得最终的胜利<br>We don’t know how long this will take,<br>我们不知道这场战争将持续多久<br>or what cost we have to pay,<br>又或者我们将付出什么代价<br>But there’s one thing we are 100% sure<br>但有一件事我们100%的确定<br>That is<br>那就是<br>We are going to win this war in the end!<br>我们终将赢得这场战争的胜利！</p><p>Because that’s what we’ve been doing<br>因为在过去5000年的历史中<br>for the past 5000 years.<br>我们就是如此<br>And that’s what makes us<br>而正因如此才成就了我们<br>the greatest nation ever<br>这个世上最伟大的民族<br>It is only by going through dark times<br>只有经历黑暗时刻<br>that we can separate the greatest from the great.<br>我们才能区分伟大和平庸</p><p>In each dark time,<br>在每一个黑暗时刻<br>We’ve always fought together<br>我们总是共同抗争<br>No matter how strong our enemy was<br>无论我们的敌人有多么强大<br>Or how impossible it seemed to win<br>又或者我们赢的可能微乎其微<br>We just kept fighting<br>我们都会坚持战斗<br>Because we are all fighters!<br>因为我们都是战士！<br>When all of this is over,<br>当所有这一切结束后，<br>we’ll have another great and heroic story<br>我们又有了一个伟大的英雄的故事<br>to tell our children, our grandchildren<br>可以讲给我们的子孙听<br>and they will tell the next generations.<br>而他们也将把这个故事告诉给他们的下一代<br>That’s how we’ll pass this great spirit on,<br>我们会将这份伟大的精神代代相传<br>and keep it alive forever!<br>永存不朽!</p><hr><p>— 特别鸣谢 —<br>感谢Claude Lorrain-Bouchard（加拿大）和Laila Tungcab（菲律宾）为本文提供的修改和指导意见！他们都是生活在中国的外国人，但是他们的爱没有国界。<br>同时也感谢身边的各位朋友、媒体的积极转发和传播，让更多人可以看到这篇讲演，让我们一起努力赢得这场战争的胜利！<br>——Jessica Liu</p><hr><p>本文为转载作品<br>文章版权归原作者所有</p><p>作者： Jessica Liu<br>编辑： JimmyQin（挨拍的儿）</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>演讲稿</tag>
+      
+      <tag>转载</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Freenom免费顶级域名注册教程</title>
+    <link href="/posts/14582.html"/>
+    <url>/posts/14582.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>不可多得的顶级域名，竟然还有免费宝藏…</p></blockquote> <a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/Freenom.png" srcset="/img/loading.gif" alt=""></p><p>   作为全网唯一的免费顶级域名提供商——Freenom 更是打出了A name for everyone的旗号。最高可免费申请一年，并提供续期服务，无需实名认证，DNS解析和转发功能一应俱全，堪称小站练手的完美选择，那么究竟该如何申请呢？</p><p>Freenom官方网站（<a href="http://www.freenom.com" target="_blank" rel="noopener" title="点击访问">点击访问</a>）</p><p>材料准备：</p><ul><li>电脑/手机</li><li>通往新世界大门的钥匙（VpN）</li><li>一个聪明的你<br><img src="https://assets.baklib.com/3a910a00-0713-456b-ba36-6a4d170d71c0/360%E6%88%AA%E5%9B%BE202002191128027901582087118880.jpg" srcset="/img/loading.gif" alt=""><br>百度搜索第一个就是啦（虽然前面有链接诶）<br><img src="https://assets.baklib.com/3a910a00-0713-456b-ba36-6a4d170d71c0/360%E6%88%AA%E5%9B%BE202002191140558801582087239361.jpg" srcset="/img/loading.gif" alt=""><br>进入后直接查询想要注册的域名<br><img src="https://assets.baklib.com/3a910a00-0713-456b-ba36-6a4d170d71c0/360%E6%88%AA%E5%9B%BE202002191139484431582087268425.jpg" srcset="/img/loading.gif" alt=""><br>之后会有要求登陆（特别注意网站处于半墙状态，需要tizi）<br><img src="https://assets.baklib.com/3a910a00-0713-456b-ba36-6a4d170d71c0/360%E6%88%AA%E5%9B%BE202002191138073231582087308827.jpg" srcset="/img/loading.gif" alt=""><br>选好后付费是$0，之后就能自行设置使用了</li></ul><hr><p>P.S. 如果在续期或者再次申请域名时，遇到点击按钮无效的情况，是因为网站采用了防机器人验证，每一次登陆使用需要在相同IP条件下哦！</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>教程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>个人博客被离奇屏蔽，48小时力挽解封</title>
+    <link href="/posts/55547.html"/>
+    <url>/posts/55547.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>又过了一天，我收到腾讯电脑管家回复的邮件，大意是误封的网站也要维持屏蔽状态四周，这样的结果怎么会让我满意呢？</p></blockquote><a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/pingbi.png" srcset="/img/loading.gif" alt=""></p><hr><h3 id="惊喜"><a href="#惊喜" class="headerlink" title="惊喜"></a>惊喜</h3><p>在QQ聊天过程中，如果你看到对方发来这样的链接，第一反应会是什么呢？<br><img src="https://i.niupic.com/images/2020/02/26/6W8w.png" srcset="/img/loading.gif" alt=""><br>——“这是什么劣质的广告网站？”<br>——“危险？点一下就中毒不成？”<br>——“唔，好奇害死猫，还好没点。”……<br>嗯，或许都有可能。但不管怎么想，唯一的结果就是放弃访问，理所应当的保证了安全。<br><strong>可是，</strong><br>这不就是我的博客网址吗！？<br>2月23日晚上，突然发现我的网站被QQ提示危险。屏气一试，并非一条链接出现问题，而是全站屏蔽，直接导致QQ内无法打开博客网页。如果仍要访问，必须复制链接到浏览器打开……<br><img src="https://i.niupic.com/images/2020/02/26/6WbL.jpg" srcset="/img/loading.gif" alt=""></p><hr><h3 id="源起"><a href="#源起" class="headerlink" title="源起"></a>源起</h3><p>冥思苦想，回忆了当天建站经历，结合腾讯QQ给出的被屏蔽理由：“虚假信息，多人举报”，我才大致推理出了事情缘由。我当天在网站后台上传了一套“蔡徐坤QQ来电”网页源码（<em>日后分享，嘿嘿</em>），内附了一个跳转链接到 挨拍的儿博客。当时我的博客里仅有一篇博文，哪来的违法违规内容呢？顶多有点类似引流的效果。没想到因为这个遭到热心朋友举报，腾讯AI异常灵敏当机立断屏蔽网站。<br><img src="https://i.niupic.com/images/2020/02/26/6WcM.jpg" srcset="/img/loading.gif" alt=""><br>显然，这无疑给本就流量稀少的个人博客予以重创。合着我博客重启还没一周呢。<br>(ノ-_-)ノ~┻━┻<br>无故受坑，岂不真是挨拍？这样的事情决不能发生！<br>找投诉、怼客服、拉盟友、揭黑幕，一气呵成，直捣黄龙……<br>想着容易，百度一下，才发现类似事件很多，申诉成功的案例好像很少？</p><hr><h3 id="波澜"><a href="#波澜" class="headerlink" title="波澜"></a>波澜</h3><p>不难发现，分享有类似经历的网友，大多也是个人站长和博主，误封现象的确时有发生。<br>在许多博文中都提到了直接在腾讯网址安全中心进行申诉，我也在当天填写了有关信息，但这个工单一般的系统，处理效率实在令我担心。<br>再次搜寻方法，有博主分享说在”腾讯电脑管家论坛“发帖，会得到版主亲自审核处理，解封周期很短。这样的实测经历让我深信不疑，便赶紧发帖。<br>心怀希望，却只收到了复制粘贴的标准答复，一时间，我陷入了迷茫。<br><img src="https://i.niupic.com/images/2020/02/26/6WhM.jpg" srcset="/img/loading.gif" alt=""></p><p>实在不甘心，第二天，我再次发帖，详细陈述了问题，另一位版主竟这样回复<br><img src="https://i.niupic.com/images/2020/02/26/6WhR.jpg" srcset="/img/loading.gif" alt=""><br>看来网上的方法已经失去了时效性，现在的电脑管家论坛的版主已经失去了管理屏蔽网站的职能，<br>这条路，又一次到了进退维谷的地步。</p><p>愁眉不展之时，QQ邮箱传来了久违的提示铃声。</p><p><img src="https://i.niupic.com/images/2020/02/26/6Wi0.jpg" srcset="/img/loading.gif" alt=""><br>此刻，只有等待好消息到来……</p><hr><p>又过了一天，我收到腾讯电脑管家回复的邮件，大意是误封的网站也要维持屏蔽状态四周，这样的结果怎么会让我满意呢？</p><p><img src="https://i.niupic.com/images/2020/02/26/6Wi3.jpg" srcset="/img/loading.gif" alt=""></p><p>如果真的不能通过申请解封，按照网友惯常做法，要么弃置原域名，使用新域名；要么就要购买腾讯安全认证服务，但动辄三四千到上万的价格，实在不是小站承受得起。</p><p><img src="https://i.niupic.com/images/2020/02/26/6Wid.jpg" srcset="/img/loading.gif" alt=""></p><hr><h3 id="尾声"><a href="#尾声" class="headerlink" title="尾声"></a>尾声</h3><p>尝试完各种办法后，我还是想尽力寻找人工服务。查询腾讯电脑管家的企业服务号，真有一个“网址申诉终审平台”。抱着试一试的心态，键入申请。无奈回复不在，欣然等待，竟然真的有真人客服给予回复，亲自审核。审核完毕，即刻解封。</p><p><img src="https://i.niupic.com/images/2020/02/26/6Wih.jpg" srcset="/img/loading.gif" alt=""></p><p>这里真的要为客服点个赞！<br><img src="https://i.niupic.com/images/2020/02/26/6Wij.jpg" srcset="/img/loading.gif" alt=""></p><hr><h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>网站被腾讯QQ/电脑管家屏蔽申诉技巧</p><ol><li>第一时间到<a href="https://urlsec.qq.com/complain.html" target="_blank" rel="noopener" title="腾讯网址安全中心">腾讯网址安全中心</a>填写资料申请投诉。冤有头债有主，官方才是最靠谱</li><li>如果收到了申请失败（仍保持屏蔽四周）的邮件，添加企业客服QQ<code>800090241</code>，简洁清晰地描述问题，耐心等待人工客服回复（更新说明：该方法已失效）</li><li>通过微信小程序申诉，需要进行站长认证，具体操作是上传腾讯认证文件到网站根目录。但是经我实测，上传后也总是认证失败，成功率不高（更新说明：已修复认证失败的问题）</li><li>如果真的不能解封，除了换域名，还可以使用免费的防红跳转。QQ内发送链接不会标红提示风险，手机端也会提醒复制到浏览器才能浏览网页（详情百度）</li><li>网上颇有好评的安全联盟网站，现在似有从公益项目转向服务推广的倾向，我在该网站的申请至今也没有答复</li></ol><hr><h3 id="5月30日更新说明"><a href="#5月30日更新说明" class="headerlink" title="5月30日更新说明"></a>5月30日更新说明</h3><p>难以置信，我的博客在2020.05.28又被拦截。<br>通过微信腾讯安全实验室申诉2020.05.30解封。<br>期间还是波折不断，非常感谢电脑管家论坛的版主。<br>另外，请大家注意在腾讯电脑管家论坛发帖是没有任何作用的（实测 눈_눈）</p><hr><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end3.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>博客</tag>
+      
+      <tag>趣事</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>失语症</title>
+    <link href="/posts/60705.html"/>
+    <url>/posts/60705.html</url>
+    
+    <content type="html"><![CDATA[<h2 id="失语症"><a href="#失语症" class="headerlink" title="失语症"></a>失语症</h2><blockquote><p>脑子和嘴巴抢活，嘴巴敢怒不敢言？</p></blockquote><a id="more"></a><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/lostvoice.jpg" srcset="/img/loading.gif" alt=""></p><hr><h3 id="0-零"><a href="#0-零" class="headerlink" title="0/零"></a>0/零</h3><p>“姓名？”心理医生抬起头看着面前的男人说道。<br>“时言。”时言一边说着一边偷摸看着大门的方向。<br>“什么病？”<br>“说不出话。”时言犹豫了下，说道。<br>心理医生抬起头，看傻子一样看着他：<br>“玩我？”<br>“你等会儿啊，大夫。”时言对门口喊了声，“老婆，进来。”<br>随后一个很是漂亮的女人走了进来，用一副很难受的表情看着医生。<br>“然后呢？”医生问道。<br>俩人不说话了。<br>“我们俩不能对话。”时言诚恳地在纸上写了一句话。<br>“吵架了？吵架来逗我玩？”医生终于受不了了，把笔一丢，气哼哼地看着两人。<br>时言面露难色，脑海中忽然闪过一个声音。<br>“看了吧，谁信谁傻子。”妻子叶陌陌冷哼道。<br>他看着心理医生那张气得逐渐涨红的脸，牵着叶陌陌的手，逃也似地离开了诊所。</p><h3 id="1-壹"><a href="#1-壹" class="headerlink" title="1/壹"></a>1/壹</h3><p>事情是什么时候开始不对劲的呢？<br>大概是时言和叶陌陌结婚五年的时候。<br>某一天时言在厨房做菜，炖鸡，他不怎么进厨房，倒醋的时候下意识问妻子道：“放多少盐？”<br>“半勺。”妻子的声音从脑海中传来。<br>等他加完半勺盐之后忽然察觉到有点不对劲，转过头去发现叶陌陌根本没在他的身边。<br>“我在厕所。”叶陌陌忽然说道，像是知道了他在想什么一样。<br>过了会儿，叶陌陌的声音再次传入他的脑海。<br>“你……怎么能在我大脑里说话？”<br>经过反复实验，时言和叶陌陌终于弄明白发生了什么。<br>简单来说，就是两人可以进行心灵交流了，但是比较扯的是，这种心灵交流类似于被动技能无法取消，同时这种技能还有个更扯的负面效果。<br>俩人在一起时，无法开口说话。<br>时言是个工科狗，经过多次实验之后，终于得出了两人无法开口说话的距离是5211米。<br>“真有意思，闭嘴的数还这么浪漫。”叶陌陌在脑海中冷哼道。<br>“到底是为啥呢？”时言开始寻找原因，咨询了下他的人类行为学朋友。<br>朋友到底是朋友，没有像那个心理医生一样摔钢笔，认真分析完之后说道：<br>“因为你俩的身体认为你俩张嘴交流没用。”<br>“放屁，咱俩天天交流怎么打王者和吃鸡。”叶陌陌公然在时言脑子中放屁，时言敢怒不敢言，只能把气撒到朋友身上，把这句话写到朋友的笔记本上。<br>“对啊，你俩交流太好了，到最后完全用不到嘴了，古时候说心有灵犀就是这么个道理。同时老夫老妻了，也没什么话可聊了，索性不用嘴，多好。<br>没准就是你俩的嘴比较有个性，脑子既然能沟通索性就歇了业，五官也得讲劳动法不是。”朋友一本正经道。<br>时言沉默了会儿，给他微信发了个相声《五官争功》的视频，又发了个问号。<br>朋友一拍桌子：“就是这么个理。”<br>“那怎么办呢？”时言写道。<br>“我也不知道，你们这种情况很少见，不如这样，你留下来我给你俩做些实验？”朋友跃跃欲试。<br>时言想起大学看这兄弟解剖小白鼠时候的凶残样子，连忙牵着叶陌陌的手跑出了兄弟的家。</p><h3 id="2-贰"><a href="#2-贰" class="headerlink" title="2/贰"></a>2/贰</h3><p>随时随地交流还是有好处的。尤其是这种交流是包括想法的，两人的想法是完全透明的。<br>所以吃鸡的时候，时言心念一动，叶陌陌就知道身后有人然后转身集火，所以逛商场的时候，叶陌陌心念一动，时言就知道该买哪个品牌哪个色号的口红。<br>“打野……”时言跟叶陌陌盘腿坐在沙发上，打着游戏，时言走下路，对面位置有点深入，他下意识想了下。<br>然后作为打野的叶陌陌就杀了过来，时机正好，斩获双杀。<br>“这能力还不错。”他想着，然后抬头看到了电视上播放的维密秀。<br>他忽然升起一股不好的预感，连忙把脸别过去，然而还是被叶陌陌察觉到了他的思维。<br>“想什么呢？”叶陌陌在脑海中问道，脸上满是笑容。<br>“我……”没等时言想好理由，就被叶陌陌踹了一脚。<br>“流氓！你们男的平时就想这个？”叶陌陌冷哼。<br>时言怒目而视：“我那是正常想法，OK？再说，你看小鲜肉不是也会这么想？”<br>叶陌陌微笑，夺过遥控器调到了一档男性偶像选秀节目。<br>片刻后，她面红耳赤地换了台。<br>时言在她脑海中得意洋洋道：“我就说吧。”<br>叶陌陌表情冷漠地又踢他一脚，“流氓。”</p><h3 id="3-叁"><a href="#3-叁" class="headerlink" title="3/叁"></a>3/叁</h3><p>转眼间两人处于这种状态已经两个月有余。<br>人的习惯能力是很强大的，叶陌陌和时言如今已经习惯了不说话的生活方式，很有默契地在对方看异性选秀节目时离开家去逛街或者打游戏。<br>然而生活总不能一直这么平淡下去。<br>时言的爸妈突然来了。<br>老两口来的时候没打招呼，把时言搞得措手不及，慌乱中竟然忘了两人在一起不能说话这一情况。于是只能拿出好几个月之前叶陌陌咽炎时买的药当做挡箭牌。<br>“都咽炎到不能说话？”时言他妈有点怀疑。<br>两人点头，步调一致。<br>饭桌上叶陌陌瞅着时言妈妈做的香辣蟹一个劲地吞口水，时言不得不提醒她道：<br>“稳住，你现在是个有咽炎的人，不能吃辣。”<br>过了会儿他看着叶陌陌很沮丧的脸，又想着：“想吃我以后给你做。”<br>“放屁，你这么长时间做过饭？”叶陌陌在时言脑子里翻了个白眼。<br>时言叹了口气，忽然站起来在四个人的家庭群发了个消息道：“我吃饱了，家里没酱油了，我出去买。”<br>时言爸妈看见后连忙站起身：“我们也饱了，一块去吧，顺便帮你们买点菜。”<br>“陌陌在家洗碗吧，我们仨去就好。”时言在微信分配任务。<br>“地下室不是还有吗？”叶陌陌疑惑道。<br>“傻啊，我把我爸妈骗出去，你抓紧吃几个。”时言穿上衣服，跟爸妈走出了家门。<br>“别被看见了。”他到楼下的时候叮嘱道。<br>“放心。”叶陌陌信心满满。</p><h3 id="4-肆"><a href="#4-肆" class="headerlink" title="4/肆"></a>4/肆</h3><p>跟老人买菜是件很难受的事。<br>更难受的是想到还有另一个人正在家里偷偷摸摸地吃香辣蟹。<br>“老板，便宜点吧，我儿子住在你们小区，常来光顾的。”时言他妈指着时言说道。<br>时言不好意思地笑笑，给老板使了个眼色。<br>“好的，那再便宜您五毛。”老板乐呵呵道。<br>时言他妈砍价胜利，兴冲冲地出了菜市场，时言给老板微信又转过去五毛红包，没一秒钟就被接受。<br>“谢了赵哥。”他发了个抱拳的表情。<br>“老人开心就好。”老板用一个呲牙的表情回复。<br>时言他爹去小区门口看下象棋了，母子俩继续在市场闲逛。<br>“你是不是跟陌陌吵架了。”时言他妈突然说道，露出一副了然一切的表情，“哪有咽炎能严重到一点话都说不出来的。”<br>时言不好意思地笑笑，他懒得解释，索性默认了。<br>“男生在婚姻里要多忍让点，你看看你爸爸就是，多交流，多让步，这样婚姻才能长久。”时言他妈语重心长道，完全不知道目前这个问题只是单纯的肉体问题，跟心灵毫无关系。<br>“还有，结婚五年了，还没个孩子。”<br>时言他妈仿佛不经意间提了一嘴，但时言知道这才是重头戏，不由头疼道：“妈，不是说过几年再说吗。”<br>“五年了都，还不够长？”时言他妈瞪他一眼。<br>“我们还没稳下来，等再过几年，再过几年。也该回家了，我去找我爸。”时言头都大了，连忙找了个理由去找他爸。<br>时言他妈忽然笑了出来：“不装哑巴了？”<br>时言不好意思地挠了挠头，小跑着去了小区外老头们聚集的绿树荫。</p><h3 id="5-伍"><a href="#5-伍" class="headerlink" title="5/伍"></a>5/伍</h3><p>时言站在碗池前刷碗，叶陌陌送完公公婆婆开门走了进来。<br>“你妈又说生孩子的事了？”叶陌陌在他脑海中说道。<br>“嗯。”共享思维就是这点不好，想什么都能传过去。他不想跟叶陌陌透露这个事，怕给她增加压力。<br>“不是共享思维啦，一起住这么多年了你什么心情我还看不出来，一猜就知道你家里人来是为了什么。”叶陌陌大大咧咧地说。<br>时言这才想明白原来连对共享思维的抱怨都传了过去，很是无奈地耸了耸肩膀。<br>他又感知到叶陌陌的思维似乎有些黯淡。<br>“我们总不能一辈子这样下去吧。”她说道。<br>时言知道她说的“这样”包括说不出话以及无限期地往后拖延要孩子这两件事。<br>“你想吗？”时言小心翼翼地问道。<br>叶陌陌摇了摇头，但是传过来的却是很迷茫的情绪。“我不知道，总想先混一天是一天。”<br>“那你呢？”叶陌陌同样小心翼翼地试探道。<br>“我听你的。”时言的答案也并不明确。<br>两人沉默了半天，或者说互相感知的思绪嘈杂了半天，因为已经繁杂道大脑无法判定对方的真实想法。<br>叶陌陌晃了晃头，振作起精神道：“科学表明，如果我们有很多事没想好该怎么去做，不如就先去做那个我们一定要做的。”<br>“那我们做什么？”时言问道。<br>“张嘴说话。”<br>叶陌陌拿出手机，开始下电影。</p><h3 id="6-陆"><a href="#6-陆" class="headerlink" title="6/陆"></a>6/陆</h3><p>叶陌陌和时言两人一脸严肃地站在电视机前，跟着电视中的国王拍打两颊。<br>“这么做管用吗？”时言有些怀疑。<br>“这电影是真实故事改编，有一定真实性的。”叶陌陌正色道。<br>两人看的电影是《国王的演讲》，正演到教师交给王子锻炼嘴部肌肉的片段。<br>过了很久，直到两人脸颊通红，还是没能说出话来。<br>“我们要不要试试别的……”<br>时言刚问完，忽然察觉到叶陌陌的情绪似乎有点不对劲，他转头看过去，发现叶陌陌正抱着膝盖在哭。<br>“我们是不是一辈子要这样了。”她无声地流着眼泪，抽噎着在时言的脑海中诉说。<br>“肯定有别的方法的。”时言安慰道，但是叶陌陌的思维很快传了过来：<br>“别骗我了，我们能共享思维，你也不知道对不对。”<br>“那我们怎么办啊。”叶陌陌低着头。<br>时言也不回应了。<br>是啊，结婚就是这么无聊的事。<br>不能总是以咽炎为借口在聚会时不说话，不能总是用“过几年”的说辞来逃避孩子等等的问题，不能总像恋爱时一样有着说不尽的话，不能总像小时候向往的那样只有美好而没有烦恼。<br>两人脑海中同时浮现出某个解决办法，然后又有意识地将这办法从自己脑海中抹除，生怕对方发现。<br>“我出去下。”时言突然站了起来，匆匆走出了房屋。</p><h3 id="7-柒"><a href="#7-柒" class="headerlink" title="7/柒"></a>7/柒</h3><p>时言正准备走出小区，忽然发现小区门口有个熟悉的身影。<br>“爸！”他喊道，一个站着围观的老头扭过头，对他挥了挥手。<br>“你怎么来也不打声招呼。”时言跟他爸走在小区的步道上，时言埋怨道。<br>“我来看下象棋的，顺道来看看你。”时言他爸笑道。<br>两人走了一段，没什么话说，时言刚想张口说让他回家坐会儿，老头却先张了口。<br>“是你妈非让我来，说你跟陌陌吵架了，让我来劝劝。”<br>时言愣了下，“那我妈怎么不来。”<br>“她说公公婆婆得一个唱白脸一个唱黑脸，这样媳妇才不至于对你太差。”老头不屑道，“我就觉得没什么嘛。”<br>时言想起那天他妈跟他说的话，不由得笑了起来。<br>“你们要是吵架啊，估计也是为了孩子，这事呢说我跟你妈不着急那是假的，但是毕竟是你自己的事，我们也不好说什么，陌陌是个好孩子，不乐意的话别逼人家，没孩子照样过。”<br>“我知道你们年轻人喜欢这种生活方式，我们这些老人跟不上时代了，你们自己愿意，我们也就将就来，只是你妈唠叨，她也就说说，你让陌陌别往心里去……”<br>时言他爸丝毫没察觉到自己也开始唠叨起来。<br>时言笑了笑，忽然问道：“爸，您有没有跟我妈到没话说的时候。”<br>老头想了想，点了点头，又摇了摇头：“说真的，结婚一年我俩就没话说了，什么一开始那股子新鲜感全没了，俩人就是正常上班下班。<br>一开始不习惯，可是后来越来越觉得那些废话也挺有意思，今天的葱贵了几毛钱，明天去哪家串个门，谁家的孩子又考了一百分了，越听越有滋味。”<br>“两个人过日子，哪有天天是激情的，就是两个人没话找话，然后还偏偏觉得没他不行，有些话只有从那个人的嘴里说出来，才叫日子，才叫滋味。”<br>时言感觉自己明白了什么，但还是问了他爸一个问题：<br>“要是真一点话都说不出来呢？”<br>老头想了想，看着时言的眼睛说道：<br>“那你应该就是忘了你最初对她说过的话。”</p><h3 id="8-捌"><a href="#8-捌" class="headerlink" title="8/捌"></a>8/捌</h3><p>时言送完他爸回家已经是十点多了。<br>回到家，看见叶陌陌已经恢复了情绪，无需时言诉说，在两人到达连接范围的瞬间她已经知道了今晚的事情。<br>“时言……”叶陌陌的思绪欲言又止。<br>“陌陌，我想清楚了，不知道你怎么想的，但是我觉得这么过一辈子也不错。”时言忽然说道。<br>叶陌陌显然没有理解这个想法。<br>“孩子的话，你想要就要，我会支持你的决定，如果你不想要的话爸妈那边我去说。至于不说话……”他挠了挠头，“我还挺喜欢这样子的，还能省话费。”<br>然后他踏步上前，笑着把叶陌陌搂在怀里。<br>叶陌陌的脸猛地通红，在时言的脑海中骂道：“老夫老妻了，抱什么抱。”<br>时言没说话，只是轻轻抱着她，感受着两人思绪交融。<br>忽然，他似乎察觉了什么。<br>“我好像……知道该怎么让我说话了。”他抓住叶陌陌的肩膀，眼中带着欣喜。<br>“怎么说？”叶陌陌好奇地瞪大了眼睛。<br>“我不能说话，是因为我忘了我最初说过的话。”<br>时言清了清喉咙，重新想起自己很久未说过的，但是却藏在两人生活中点点滴滴的字眼。<br>这句话随着时间流逝填充着他们生活的每个缝隙，但是却忘了偶尔将它拿出来。<br>像是从梦境中清醒，又像是嫩芽破开冻土，时言费力地震动喉咙，将那句他好久没有说过的话再次对眼前人说出。<br>声音稚嫩如初见的情侣，语气却有被生活打磨过的温润痕迹。</p><p>“我爱你。”</p><p>他这么说着。</p><p><strong>End/完</strong></p><hr><blockquote><p>简单的生活，因爱之深而心有灵犀。却忘掉最初的感动，缄默不语。好在，原来是珍藏心底，爱的动力未曾失去。</p></blockquote><p>本文为转载作品<br>文章版权归原作者所有</p><p>作者： 微博@山城二十四<br>编辑： JimmyQin（挨拍的儿）<br>图源： 酷安酷图</p><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end1.jpg" srcset="/img/loading.gif" alt=""></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>转载</tag>
+      
+      <tag>小说</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="/posts/16107.html"/>
+    <url>/posts/16107.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>2020 有点狼狈的开始，博客重启，也许是一点小小的希望。</p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/aipaideer/pic/helloworld.jpg" srcset="/img/loading.gif" alt=""></p><a id="more"></a><h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><p>一个对程序猿来说绝不陌生的熟悉句子。<br>不论哪种类型的编程语言，第一个示范工程，一定会输出一句”Hello World”<br>不知这样的传统因何而起、何时发生？<br>但延续至今，总有一种不变的希望，和未知的喜悦，潜藏开始的讯号之中。<br>千里之行，始于足下。<br>今日第一篇博文发表，仿佛打开天窗，世界尽在眼前，用一句亲切的问候：<br>开启无尽的探索。<br>愿美好长存，流露文字之间～</p><p>————原文于2018.5.3</p><h2 id="Meet-Again"><a href="#Meet-Again" class="headerlink" title="Meet Again"></a>Meet Again</h2><p>从内网穿透，到免费的一站式建站，辗转租用主机，犹记初次安装WordPress时的欣喜。<br>今年，自收到域名商到期通知的那一刻起，我的github Page也算是凉凉了。<br>转攻云端笔记、云知识库等平台，仍然不安于受限制的书写。<br>果然，hexo我又回来了，没有再折腾什么CDN和伪静态也能有一个awesome的响应速度。</p><h2 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h2><p>或许未来可期？且从认真撰写一篇篇博文开始吧！</p><hr><p>：）</p><p>JimmyQin</p><p>————2020.2.21夜</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>随笔</tag>
+      
+      <tag>博客</tag>
+      
+      <tag>建站纪念</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
