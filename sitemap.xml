@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://jimmyqin.cn/about/index.html</loc>
+    
+    <lastmod>2020-07-05T14:09:34.790Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://jimmyqin.cn/comment/index.html</loc>
     
     <lastmod>2020-07-05T13:29:57.195Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>http://jimmyqin.cn/editor/index.html</loc>
     
     <lastmod>2020-07-05T13:12:50.465Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://jimmyqin.cn/about/index.html</loc>
-    
-    <lastmod>2020-07-05T13:12:30.615Z</lastmod>
     
   </url>
   
