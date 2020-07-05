@@ -1,3 +1,3 @@
-// build time:Sat Jun 27 2020 19:00:59 GMT+0800 (Central Standard Time)
+// build time:Sun Jul 05 2020 08:09:31 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"),require("./runmode"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror","./runmode"],e);else e(CodeMirror)})(function(e){"use strict";var o=/^(p|li|div|h\\d|pre|blockquote|td)$/;function r(e,i){if(e.nodeType==3)return i.push(e.nodeValue);for(var n=e.firstChild;n;n=n.nextSibling){r(n,i);if(o.test(e.nodeType))i.push("\n")}}e.colorize=function(o,i){if(!o)o=document.body.getElementsByTagName("pre");for(var n=0;n<o.length;++n){var t=o[n];var d=t.getAttribute("data-lang")||i;if(!d)continue;var f=[];r(t,f);t.innerHTML="";e.runMode(f.join(""),d,t);t.className+=" cm-s-default"}}});
 //rebuild by neat 
