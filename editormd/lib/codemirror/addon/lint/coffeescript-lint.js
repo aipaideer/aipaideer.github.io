@@ -1,3 +1,3 @@
-// build time:Sun Jul 05 2020 22:11:28 GMT+0800 (Central Standard Time)
+// build time:Mon Jul 06 2020 20:48:04 GMT+0800 (Central Standard Time)
 (function(e){if(typeof exports=="object"&&typeof module=="object")e(require("../../lib/codemirror"));else if(typeof define=="function"&&define.amd)define(["../../lib/codemirror"],e);else e(CodeMirror)})(function(e){"use strict";e.registerHelper("lint","coffeescript",function(o){var r=[];if(!window.coffeelint){if(window.console){window.console.error("Error: window.coffeelint not defined, CodeMirror CoffeeScript linting cannot run.")}return r}var i=function(o){var i=o.lineNumber;r.push({from:e.Pos(i-1,0),to:e.Pos(i,0),severity:o.level,message:o.message})};try{var n=coffeelint.lint(o);for(var t=0;t<n.length;t++){i(n[t])}}catch(f){r.push({from:e.Pos(f.location.first_line,0),to:e.Pos(f.location.last_line,f.location.last_column),severity:"error",message:f.message})}return r})});
 //rebuild by neat 
