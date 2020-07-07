@@ -1,3 +1,3 @@
-// build time:Mon Jul 06 2020 20:48:01 GMT+0800 (Central Standard Time)
+// build time:Tue Jul 07 2020 23:41:29 GMT+0800 (Central Standard Time)
 var blint=require("blint");["mode","lib","addon","keymap"].forEach(function(e){blint.checkDir(e,{browser:true,allowedGlobals:["CodeMirror","define","test","requirejs"],ecmaVersion:5,tabs:e=="lib"})});["src"].forEach(function(e){blint.checkDir(e,{browser:true,ecmaVersion:6,semicolons:false})});module.exports={ok:blint.success()};
 //rebuild by neat 
