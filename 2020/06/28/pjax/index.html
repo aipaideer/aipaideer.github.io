@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="挨拍的儿,JimmyQin,个人博客,独立博客,blog,部落格">
+    <meta name="description" content="JimmyQin的小站，不仅仅是个人博客。探索未知，记录生活，分享有趣！">
+    <meta name="author" content="JimmyQin">
+    
+    <title>
+        
+            为Fluid主题简单添加PJAX支持 |
+        
+        JimmyQin&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/favicon.png">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/css/font-awesome.min.css">
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"jimmyqin.com","root":"/","language":"zh-CN"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/favicon.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":true,"scale":true},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"春风十里，与你相遇"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"3.4.3"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <span class="pjax-progress-icon">
+            <i class="fas fa-circle-notch fa-spin"></i>
+        </span>
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                JimmyQin&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                归档
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/links"
+                            >
+                                友链
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/about"
+                            >
+                                关于
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               target="_blank" rel="noopener" href="https://travellings.link"
+                            >
+                                开往
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">归档</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/links">友链</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/about">关于</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       target="_blank" rel="noopener" href="https://travellings.link">开往</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">为Fluid主题简单添加PJAX支持</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.png">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">JimmyQin</span>
+                        
+                            <span class="author-label">前端小白</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2020-06-28 10:58:37
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E5%8D%9A%E5%AE%A2/">博客</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E6%95%99%E7%A8%8B/">教程</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/Hexo/">Hexo</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>一点微小的工作，初步实现无刷新加载。<span id="more"></span><br><em>本教程仅在Fluid主题1.8.1版本测试通过。</em></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/aipaideer/pic/pjax.png"
+                     
+                ></p>
+<h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><p><strong>pjax是什么？</strong></p>
+<blockquote>
+<p>pjax 结合 pushState 和 ajax 技术（PJAX=history.pushState+ajax）， 不需要重新加载整个页面就能从服务器加载 Html 到你当前页面，这个 ajax 请求会有永久链接、title 并支持浏览器的回退/前进按钮。</p>
+</blockquote>
+<p>简单来说pjax就是<strong>无刷新加载</strong>，看起来似乎很高端，但其实很多网站都已经在使用和pjax类似的技术，比如百度搜索：在搜索页更换关键词搜索，页面只是部分内容重载。</p>
+<p>pjax的优点和好处很多，仅就个人博客而言，最直观的体验就是能够实现<strong>页面平滑切换</strong>和音乐<strong>不间断播放</strong>。</p>
+<p>pjax效果演示：<a class="link"   target="_blank" rel="noopener" href="http://pjax.herokuapp.com/" >http://pjax.herokuapp.com<i class="fas fa-external-link-alt"></i></a><br>~~ 或者就在<a class="link"   target="_blank" rel="noopener" href="https://jimmyqin.cn/"  title="本站体验">本站体验<i class="fas fa-external-link-alt"></i></a>。 ~~</p>
+<p>pjax这般优秀，奈何本站使用的如此好看的Fluid主题竟然不支持，只好自己动手，慢慢摸索和折腾一下。</p>
+<h2 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h2><h3 id="1、版本选用"><a href="#1、版本选用" class="headerlink" title="1、版本选用"></a>1、版本选用</h3><p>ONE.<a class="link"   target="_blank" rel="noopener" href="https://github.com/defunkt/jquery-pjax"  title="jquery-pjax">jquery-pjax<i class="fas fa-external-link-alt"></i></a><br>TWO.<a class="link"   target="_blank" rel="noopener" href="https://github.com/MoOx/pjax"  title="Moox-pjax">Moox-pjax<i class="fas fa-external-link-alt"></i></a></p>
+<p>第一个是需要使用jquery依赖的版本，俩版本大同小异，只是后者代码更新日期较新，在这里我选用了后者。</p>
+<p>推荐首先阅读下<a class="link"   target="_blank" rel="noopener" href="https://github.com/MoOx/pjax/blob/master/README.md"  title="官方文档">官方文档<i class="fas fa-external-link-alt"></i></a>。</p>
+<h3 id="2、引入js"><a href="#2、引入js" class="headerlink" title="2、引入js"></a>2、引入js</h3><p>在<code>/主题目录/layout/partial/footer.ejs</code>中加入</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>来引入pjax；</p>
+<p>或者使用npm安装本地后引用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install pjax</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;./node_modules/pjax/pjax.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>现在，我们已经安成了pjax的安装，本地预览一下，页面跳转已初见成效。但你可能会发现，标题消失、图片失效等等各项功能异常。别着急，这是由于部分js未能加载导致的，稍后会解决。</p>
+<h2 id="三、使用"><a href="#三、使用" class="headerlink" title="三、使用"></a>三、使用</h2><h3 id="1、功能配置"><a href="#1、功能配置" class="headerlink" title="1、功能配置"></a>1、功能配置</h3><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span><br><span class="line"><span class="javascript">    <span class="comment">// pjax</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> pjax = <span class="keyword">new</span> Pjax(&#123;</span></span><br><span class="line"><span class="javascript">    <span class="attr">selectors</span>: [</span></span><br><span class="line"><span class="javascript">      <span class="string">&quot;title&quot;</span>, <span class="comment">//加载标题</span></span></span><br><span class="line"><span class="javascript">      <span class="string">&quot;main&quot;</span>, <span class="comment">//加载主体框架部分</span></span></span><br><span class="line"><span class="javascript">      <span class="string">&quot;header&quot;</span>, <span class="comment">//加载头部（文章页头图等）</span></span></span><br><span class="line"><span class="javascript">    ]</span></span><br><span class="line"><span class="javascript">   &#125;)</span></span><br><span class="line"><span class="javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>elements选择触发器，即点击什么来触发pjax（只能用a或者form），a为链接。<br>selectors根据css选择器来选择更新的节点（即当触发elements时哪些内容会刷新，其余部分保持不变）</p>
+</blockquote>
+<p>有用的pjax函数</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pjax.loadUrl();</span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:send&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:error&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、项目优化"><a href="#2、项目优化" class="headerlink" title="2、项目优化"></a>2、项目优化</h3><h4 id="2-1-Valine评论重载"><a href="#2-1-Valine评论重载" class="headerlink" title="2.1 Valine评论重载"></a>2.1 Valine评论重载</h4><p>在Fluid1.8.1版本中已经解决了 <strong>pjax刷新后发现评论不能加载</strong> 这个<a class="link"   target="_blank" rel="noopener" href="https://github.com/xCss/Valine/issues/138"  title="问题">问题<i class="fas fa-external-link-alt"></i></a>，如果使用<strong>1.8.0及以下版本</strong>需要进行下面的操作。<br>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//加载valine</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">LoadValine</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      $.getScript(<span class="string">&quot;https://cdn.staticfile.org/valine/1.4.14/Valine.min.js&quot;</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">          </span><br><span class="line">        <span class="comment">// 生成评论的代码</span></span><br><span class="line">        <span class="keyword">var</span> GUEST_INFO = [<span class="string">&#x27;nick&#x27;</span>,<span class="string">&#x27;mail&#x27;</span>,<span class="string">&#x27;link&#x27;</span>];</span><br><span class="line">        <span class="keyword">var</span> guest_info = <span class="string">&#x27;&lt;%= theme.valine.meta %&gt;&#x27;</span>.split(<span class="string">&#x27;,&#x27;</span>).filter(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>)</span>&#123;</span><br><span class="line">          <span class="keyword">return</span> GUEST_INFO.indexOf(item) &gt; -<span class="number">1</span></span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">var</span> valine = <span class="keyword">new</span> Valine();</span><br><span class="line">        valine.init(&#123;</span><br><span class="line">          <span class="attr">el</span>: <span class="string">&quot;#vcomments&quot;</span>,</span><br><span class="line">          <span class="attr">guest_info</span>: guest_info,</span><br><span class="line">          <span class="attr">app_id</span>: <span class="string">&quot;&lt;%= theme.valine.appid %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">app_key</span>: <span class="string">&quot;&lt;%= theme.valine.appkey %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">placeholder</span>: <span class="string">&quot;&lt;%= theme.valine.placeholder %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">path</span>: &lt;%= theme.valine.path %&gt;,</span><br><span class="line">          avatar: <span class="string">&quot;&lt;%= theme.valine.avatar %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">meta</span>: &lt;%- <span class="built_in">JSON</span>.stringify(theme.valine.meta || []) %&gt;,</span><br><span class="line">          pageSize: <span class="string">&quot;&lt;%= theme.valine.pageSize %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">lang</span>: <span class="string">&quot;&lt;%= theme.valine.lang %&gt;&quot;</span>,</span><br><span class="line">          <span class="attr">highlight</span>: &lt;%= theme.valine.highlight %&gt;,</span><br><span class="line">          recordIP: &lt;%= theme.valine.recordIP %&gt;,</span><br><span class="line">          serverURLs: <span class="string">&quot;&lt;%= theme.valine.serverURLs %&gt;&quot;</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>然后进行这个函数的重载</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">    LoadValine();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>如果在<strong>自建页面</strong><a class="link"   target="_blank" rel="noopener" href="https://hexo.fluid-dev.com/docs/example/#%E5%9C%A8%E6%96%B0%E5%BB%BA%E9%A1%B5%E9%9D%A2%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA"  title="使用了Valine评论">使用了Valine评论<i class="fas fa-external-link-alt"></i></a>，仍需要添加<code>//加载valine</code>函数，但是请将重载指令放在评论所在页面的.md文件中，避免出现评论重复加载现象。同时为了保证在该页面刷新时重载评论，需要使用pjax的load函数。<br>完整示例如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- pjax完成/监听刷新加载Valine --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span><br><span class="line"><span class="javascript"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">   LoadValine();</span></span><br><span class="line"><span class="javascript"> &#125;);</span></span><br><span class="line"><span class="javascript"><span class="built_in">window</span>.addEventListener(<span class="string">&#x27;load&#x27;</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">   LoadValine();</span></span><br><span class="line"><span class="javascript"> &#125;);</span></span><br><span class="line"><span class="javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>然而，这样操作以后，还是会出现一些bug：在文章页评论加载完毕以后，用户跳转留言页，再返回到刚刚访问的文章页时，会出现评论重复的现象。我还在寻找修复方法，但是一般访问情景应该不会有特别大的影响。<br><del>（谁会在页面之间反复横跳呢？）</del></p>
+<h4 id="2-2-懒加载修复"><a href="#2-2-懒加载修复" class="headerlink" title="2.2 懒加载修复"></a>2.2 懒加载修复</h4><p>在<code>/主题目录/layout/layout.ejs</code>中添加重载函数如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">      $.getScript(<span class="string">&quot;/js/lazyload.js&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-下滑箭头、抖动等修复"><a href="#2-3-下滑箭头、抖动等修复" class="headerlink" title="2.3 下滑箭头、抖动等修复"></a>2.3 下滑箭头、抖动等修复</h4><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">  $.getScript(<span class="string">&quot;/js/main.js&quot;</span>);</span><br><span class="line">  $.getScript(<span class="string">&quot;/js/debouncer.js&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 窗口监听load(加载、刷新)事件，执行函数</span></span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">&#x27;load&#x27;</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"> $.getScript(<span class="string">&quot;/js/main.js&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="2-4-FancyBox重载"><a href="#2-4-FancyBox重载" class="headerlink" title="2.4 FancyBox重载"></a>2.4 FancyBox重载</h4><p>在<code>/主题目录/layout/layout.ejs</code>中插入代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">//加载FancyBox</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">LoadFancyBox</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">$(<span class="string">&#x27;#post img:not(.no-zoom img, img[no-zoom]), img[zoom]&#x27;</span>).each(</span><br><span class="line">     <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">       <span class="keyword">var</span> element = <span class="built_in">document</span>.createElement(<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">       $(element).attr(<span class="string">&#x27;data-fancybox&#x27;</span>, <span class="string">&#x27;images&#x27;</span>);</span><br><span class="line">       $(element).attr(<span class="string">&#x27;href&#x27;</span>, $(<span class="built_in">this</span>).attr(<span class="string">&#x27;src&#x27;</span>));</span><br><span class="line">       $(<span class="built_in">this</span>).wrap(element);</span><br><span class="line">     &#125;</span><br><span class="line">   );</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
+<p>然后进行这个函数的重载</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>,</span><br><span class="line"><span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">     LoadFancyBox();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>bug：在关闭放大的图片后，页面会漂移。<br>我暂时关闭了这个功能。</p>
+<h4 id="2-5-修复MarkDown样式丢失"><a href="#2-5-修复MarkDown样式丢失" class="headerlink" title="2.5 修复MarkDown样式丢失"></a>2.5 修复MarkDown样式丢失</h4><p>在<a class="link"   target="_blank" rel="noopener" href="https://github.com/fluid-dev/hexo-theme-fluid/commit/6bc9ad2f872c6c50e5127665fb07af55f6269618"  title="Fluid1.8.1的更新">Fluid1.8.1的更新<i class="fas fa-external-link-alt"></i></a>中，强哥加入判断以减少不必要的加载项，但加入pjax之后判断似乎失效了，那么就干脆不要判断好了<del>（反向升级）</del>。<br>将<code>/主题目录/layout/_partial/css.ejs</code>中的<code>&lt;% if (is_post() || is_page()) &#123; %&gt;</code>判断删除即可。</p>
+<h4 id="2-6-加入加载动画"><a href="#2-6-加入加载动画" class="headerlink" title="2.6 加入加载动画"></a>2.6 加入加载动画</h4><p>css如下:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.loading</span>&#123;<span class="attribute">display</span>:none&#125;</span><br><span class="line"><span class="selector-class">.loading</span>&#123;<span class="attribute">height</span>:<span class="number">100%</span>;<span class="attribute">width</span>:<span class="number">100%</span>;<span class="attribute">position</span>:fixed;<span class="attribute">top</span>:<span class="number">0</span>;<span class="attribute">left</span>:<span class="number">0</span>;<span class="attribute">z-index</span>:<span class="number">999999</span>;<span class="attribute">background-color</span>:<span class="built_in">rgba</span>(<span class="number">250</span>,<span class="number">250</span>,<span class="number">250</span>,.<span class="number">9</span>)&#125;</span><br><span class="line"><span class="selector-class">.loading</span> <span class="selector-tag">img</span>&#123;<span class="attribute">width</span>: <span class="number">280px</span>;<span class="attribute">height</span>:<span class="number">210px</span>;<span class="attribute">position</span>: relative;<span class="attribute">top</span>: <span class="number">45%</span>;<span class="attribute">left</span>: <span class="number">50%</span>;<span class="attribute">margin-left</span>:-<span class="number">140px</span>;<span class="attribute">margin-top</span>: -<span class="number">105px</span>;&#125;</span><br><span class="line"><span class="selector-id">#loader</span>&#123;<span class="attribute">display</span>: block; <span class="attribute">position</span>: relative; <span class="attribute">left</span>: <span class="number">50%</span>; <span class="attribute">top</span>: <span class="number">50%</span>; <span class="attribute">width</span>: <span class="number">150px</span>; <span class="attribute">height</span>: <span class="number">150px</span>; <span class="attribute">margin</span>: -<span class="number">75px</span> <span class="number">0</span> <span class="number">0</span> -<span class="number">75px</span>; <span class="attribute">border-radius</span>: <span class="number">50%</span>; <span class="attribute">border</span>: <span class="number">3px</span> solid transparent; <span class="attribute">border-top-color</span>: <span class="number">#ff5a5a</span>; -webkit-<span class="attribute">animation</span>: spin <span class="number">1s</span> linear infinite; <span class="attribute">animation</span>: spin <span class="number">1s</span> linear infinite;&#125;</span><br><span class="line"><span class="selector-id">#loader</span>:before&#123;content: <span class="string">&quot;&quot;</span>; <span class="attribute">position</span>: absolute; <span class="attribute">top</span>: <span class="number">5px</span>; <span class="attribute">left</span>: <span class="number">5px</span>; <span class="attribute">right</span>: <span class="number">5px</span>; <span class="attribute">bottom</span>: <span class="number">5px</span>; <span class="attribute">border-radius</span>: <span class="number">50%</span>; <span class="attribute">border</span>: <span class="number">3px</span> solid transparent; <span class="attribute">border-top-color</span>: <span class="number">#5af33f</span>; -webkit-<span class="attribute">animation</span>: spin <span class="number">3s</span> linear infinite; <span class="attribute">animation</span>: spin <span class="number">3s</span> linear infinite;&#125;</span><br><span class="line"><span class="selector-id">#loader</span>:after&#123;content: <span class="string">&quot;&quot;</span>; <span class="attribute">position</span>: absolute; <span class="attribute">top</span>: <span class="number">15px</span>; <span class="attribute">left</span>: <span class="number">15px</span>; <span class="attribute">right</span>: <span class="number">15px</span>; <span class="attribute">bottom</span>: <span class="number">15px</span>; <span class="attribute">border-radius</span>: <span class="number">50%</span>; <span class="attribute">border</span>: <span class="number">3px</span> solid transparent; <span class="attribute">border-top-color</span>: <span class="number">#6dc9ff</span>; -webkit-<span class="attribute">animation</span>: spin <span class="number">2s</span> linear infinite; <span class="attribute">animation</span>: spin <span class="number">2s</span> linear infinite;&#125;</span><br><span class="line"><span class="keyword">@-webkit-keyframes</span> spin&#123;<span class="number">0%</span>&#123;-webkit-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>); -ms-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>); <span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>);&#125; <span class="number">100%</span>&#123;-webkit-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>); -ms-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>); <span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>);&#125;&#125;</span><br><span class="line"><span class="keyword">@keyframes</span> spin&#123;<span class="number">0%</span>&#123;-webkit-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>); -ms-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>); <span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">0deg</span>);&#125; <span class="number">100%</span>&#123;-webkit-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>); -ms-<span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>); <span class="attribute">transform</span>: <span class="built_in">rotate</span>(<span class="number">360deg</span>);&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>pjax载入动画：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">// 开始 PJAX 执行的函数</span></span><br><span class="line">  <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:send&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">$(<span class="string">&quot;.loading&quot;</span>).css(<span class="string">&quot;display&quot;</span>, <span class="string">&quot;block&quot;</span>);<span class="comment">//加载转圈圈的css</span></span><br><span class="line"> &#125;);</span><br><span class="line"></span><br><span class="line"> <span class="comment">// PJAX 完成之后执行的函数，可以和上面的重载放在一起</span></span><br><span class="line"> <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">$(<span class="string">&quot;.loading&quot;</span>).css(<span class="string">&quot;display&quot;</span>, <span class="string">&quot;none&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>另外推荐一下Nprogress.js也很好看。</p>
+<h2 id="四、本站pjax完整代码"><a href="#四、本站pjax完整代码" class="headerlink" title="四、本站pjax完整代码"></a>四、本站pjax完整代码</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span><br><span class="line"><span class="javascript">  <span class="comment">// pjax</span></span></span><br><span class="line"><span class="javascript">  <span class="keyword">var</span> pjax = <span class="keyword">new</span> Pjax(&#123;</span></span><br><span class="line"><span class="javascript">  <span class="attr">selectors</span>: [</span></span><br><span class="line"><span class="javascript">    <span class="string">&quot;title&quot;</span>,</span></span><br><span class="line"><span class="javascript">    <span class="string">&quot;main&quot;</span>,</span></span><br><span class="line"><span class="javascript">    <span class="string">&quot;header&quot;</span>,</span></span><br><span class="line"><span class="javascript">  ]</span></span><br><span class="line"><span class="javascript"> &#125;)</span></span><br><span class="line"><span class="javascript">    </span></span><br><span class="line"><span class="javascript">        <span class="comment">//加载valine</span></span></span><br><span class="line"><span class="javascript"> <span class="function"><span class="keyword">function</span> <span class="title">LoadValine</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">    $.getScript(<span class="string">&quot;https://cdn.staticfile.org/valine/1.4.14/Valine.min.js&quot;</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        </span></span><br><span class="line"><span class="javascript">      <span class="comment">// 生成评论的代码</span></span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> GUEST_INFO = [<span class="string">&#x27;nick&#x27;</span>,<span class="string">&#x27;mail&#x27;</span>,<span class="string">&#x27;link&#x27;</span>];</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> guest_info = <span class="string">&#x27;&lt;%= theme.valine.meta %&gt;&#x27;</span>.split(<span class="string">&#x27;,&#x27;</span>).filter(<span class="function"><span class="keyword">function</span>(<span class="params">item</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> GUEST_INFO.indexOf(item) &gt; -<span class="number">1</span></span></span><br><span class="line"><span class="javascript">      &#125;);</span></span><br><span class="line"><span class="javascript">      <span class="keyword">var</span> valine = <span class="keyword">new</span> Valine();</span></span><br><span class="line"><span class="javascript">      valine.init(&#123;</span></span><br><span class="line"><span class="javascript">        <span class="attr">el</span>: <span class="string">&quot;#vcomments&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">guest_info</span>: guest_info,</span></span><br><span class="line"><span class="javascript">        <span class="attr">app_id</span>: <span class="string">&quot;&lt;%= theme.valine.appid %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">app_key</span>: <span class="string">&quot;&lt;%= theme.valine.appkey %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">placeholder</span>: <span class="string">&quot;&lt;%= theme.valine.placeholder %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">path</span>: &lt;%= theme.valine.path %&gt;,</span></span><br><span class="line"><span class="javascript">        avatar: <span class="string">&quot;&lt;%= theme.valine.avatar %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">meta</span>: &lt;%- <span class="built_in">JSON</span>.stringify(theme.valine.meta || []) %&gt;,</span></span><br><span class="line"><span class="javascript">        pageSize: <span class="string">&quot;&lt;%= theme.valine.pageSize %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">lang</span>: <span class="string">&quot;&lt;%= theme.valine.lang %&gt;&quot;</span>,</span></span><br><span class="line"><span class="javascript">        <span class="attr">highlight</span>: &lt;%= theme.valine.highlight %&gt;,</span></span><br><span class="line"><span class="javascript">        recordIP: &lt;%= theme.valine.recordIP %&gt;,</span></span><br><span class="line"><span class="javascript">        serverURLs: <span class="string">&quot;&lt;%= theme.valine.serverURLs %&gt;&quot;</span></span></span><br><span class="line"><span class="javascript">      &#125;)</span></span><br><span class="line"><span class="javascript">  &#125;);</span></span><br><span class="line"><span class="javascript">&#125;;</span></span><br><span class="line"><span class="javascript"></span></span><br><span class="line"><span class="javascript">      <span class="comment">//pjax开始时加载函数</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:send&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">  $(<span class="string">&quot;.loading&quot;</span>).css(<span class="string">&quot;display&quot;</span>, <span class="string">&quot;block&quot;</span>);<span class="comment">//加载转圈圈的css</span></span></span><br><span class="line"><span class="javascript">   &#125;);</span></span><br><span class="line"><span class="javascript">    </span></span><br><span class="line"><span class="javascript">     <span class="comment">// pjax加载结束后执行函数</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">document</span>.addEventListener(<span class="string">&#x27;pjax:complete&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">    $(<span class="string">&quot;.loading&quot;</span>).css(<span class="string">&quot;display&quot;</span>, <span class="string">&quot;none&quot;</span>);</span></span><br><span class="line"><span class="javascript">      $.getScript(<span class="string">&quot;/js/lazyload.js&quot;</span>);</span></span><br><span class="line"><span class="javascript">      $.getScript(<span class="string">&quot;/js/main.js&quot;</span>);</span></span><br><span class="line"><span class="javascript">      $.getScript(<span class="string">&quot;/js/debouncer.js&quot;</span>);</span></span><br><span class="line"><span class="javascript">    &#125;);</span></span><br><span class="line"><span class="javascript">    </span></span><br><span class="line"><span class="javascript">    <span class="comment">// 窗口监听load(加载、刷新)事件，执行函数</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.addEventListener(<span class="string">&#x27;load&#x27;</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">     $.getScript(<span class="string">&quot;/js/main.js&quot;</span>);</span></span><br><span class="line"><span class="javascript">    &#125;);</span></span><br><span class="line"><span class="javascript">    </span></span><br><span class="line"><span class="javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="五、To-Do-List"><a href="#五、To-Do-List" class="headerlink" title="五、To Do List"></a>五、To Do List</h2><p>以下功能暂时还没有修复，后期慢慢研究，也期待有大佬提供解决方案。</p>
+<p>代码高亮和复制按钮<br>Valine评论重复问题<br>FancyBox漂移问题<br>Typed.js文本打字机<br>Toc.js文章目录<br>anchor锚点<br>其他评论系统<br>Editor.md编辑器</p>
+<h2 id="六、后记"><a href="#六、后记" class="headerlink" title="六、后记"></a>六、后记</h2><p>参考文章：<br><a class="link"   target="_blank" rel="noopener" href="https://www.jianshu.com/p/557cad38e7dd" >https://www.jianshu.com/p/557cad38e7dd<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://inkss.cn/article/other/80b5f235.html" >https://inkss.cn/article/other/80b5f235.html<i class="fas fa-external-link-alt"></i></a><br>感谢：<a class="link"   target="_blank" rel="noopener" href="https://lluuiq.com/"  title="lluuiq">lluuiq<i class="fas fa-external-link-alt"></i></a> 和 <a class="link"   target="_blank" rel="noopener" href="https://jsonpop.cn/"  title="MoMik">MoMik<i class="fas fa-external-link-alt"></i></a> 对本站pjax实现过程中的指导和帮助。<br>由于个人能力实在有限，导致bug多多，还是期待Fluid官方支持pjax。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.jsdelivr.net/gh/aipaideer/pic/end2.jpg"
+                     
+                ></p>
+
+        </div>
+
+        
+            <div class="post-copyright-info">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li>本文标题：为Fluid主题简单添加PJAX支持</li>
+        <li>本文作者：JimmyQin</li>
+        <li>创建时间：2020-06-28 10:58:37</li>
+        <li>
+            本文链接：https://jimmyqin.com/2020/06/28/pjax/
+        </li>
+        <li>
+            版权声明：本博客所有文章除特别声明外，均采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">BY-NC-SA</a> 许可协议。转载请注明出处！
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2020/07/06/%E6%8F%92%E4%BB%B6%E5%AE%89%E8%A3%85%E9%97%AE%E9%A2%98/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Termux下npm报错syscall symlink解决方案</span>
+                                <span class="post-nav-item">上一篇</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2020/06/14/%E5%8E%9F%E9%81%93%E6%97%A0%E8%BF%B9%E8%80%B3%E6%9C%BA%E6%B5%8B%E8%AF%84/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">原道耳机上手测评，真-越级体验？</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+            <div class="comment-container">
+                <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+        <i class="fas fa-comments">&nbsp;评论</i>
+    </div>
+    
+
+        
+            
+    <div class="valine-container">
+        <script data-pjax
+                src="//cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js"></script>
+        <div id="vcomments"></div>
+        <script data-pjax>
+            function loadValine() {
+                new Valine({
+                    el: '#vcomments',
+                    appId: 'R8OtJ6oimKn9OM8TxSzA8WmQ-MdYXbMMI',
+                    appKey: 'bnWL6xgCSCRfwl64JRewRy4H',
+                    meta: ['nick', 'mail', 'link'],
+                    avatar: 'wavatar',
+                    enableQQ: true,
+                    placeholder: '你的评论，一针流血~',
+                    lang: 'zh-CN'.toLowerCase()
+                });
+
+                function getAuthor(language) {
+                    switch (language) {
+                        case 'en':
+                            return 'Author';
+                        case 'zh-CN':
+                            return '博主';
+                        default:
+                            return 'Master';
+                    }
+                }
+
+                // Add "Author" identify
+                const getValineDomTimer = setInterval(() => {
+                    const vcards = document.querySelectorAll('#vcomments .vcards .vcard');
+                    if (vcards.length > 0) {
+                        let author = 'JimmyQin';
+
+                        if (author) {
+                            for (let vcard of vcards) {
+                                const vnick_dom = vcard.querySelector('.vhead .vnick');
+                                const vnick = vnick_dom.innerHTML;
+                                if (vnick === author) {
+                                    vnick_dom.innerHTML = `${vnick} <span class="author">${getAuthor(KEEP.hexo_config.language)}</span>`
+                                }
+                            }
+                        }
+                        clearInterval(getValineDomTimer);
+                    } else {
+                        clearInterval(getValineDomTimer);
+                    }
+                }, 2000);
+            }
+
+            if ('true') {
+                const loadValineTimeout = setTimeout(() => {
+                    loadValine();
+                    clearTimeout(loadValineTimeout);
+                }, 1000);
+            } else {
+                window.addEventListener('DOMContentLoaded', loadValine);
+            }
+        </script>
+    </div>
+
+
+
+        
+    
+</div>
+
+            </div>
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>&nbsp;-&nbsp;
+            
+            2021&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">JimmyQin</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动&nbsp;|&nbsp;主题&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.3</a>
+        </div>
+        
+            <div class="icp-info info-item"><a target="_blank" rel="nofollow" href="https://icp.gov.moe/?keyword=20201818">萌ICP备 20201818号</a></div>
+        
+    </div>
+    <style>
+        .typed-cursor{
+          opacity: 1;
+            font-weight: bold;
+            font-size: 2rem;
+            line-height: 1.8;
+            text-align: center;
+            color: var(--default-text-color);
+        }
+        .typed-cursor.typed-cursor--blink{
+          animation: typedjsBlink 0.7s infinite;
+          -webkit-animation: typedjsBlink 0.7s infinite;
+                  animation: typedjsBlink 0.7s infinite;
+                    font-weight: bold;
+                    font-size: 2rem;
+                    line-height: 1.8;
+                    text-align: center;
+                    color: var(--default-text-color);
+        }
+        @keyframes typedjsBlink{
+          50% { opacity: 0.0; }
+        }
+        @-webkit-keyframes typedjsBlink{
+          0% { opacity: 1; }
+          50% { opacity: 0.0; }
+          100% { opacity: 1; }
+        }
+      </style>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js"></script>
+    <script>
+        var typed = new Typed('.description:not(.ellipsis)', {
+        strings: [
+            '  ',
+            "春风十里，与你相遇&nbsp;",
+        ],
+        cursorChar: "|",
+        typeSpeed: 70,
+        loop: false,
+        });
+    </script>
+
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+            <li class="go-comment">
+                <i class="fas fa-comment"></i>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/utils.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/main.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/header-shrink.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/back2top.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+    <script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/lazyload.js"></script>
+
+
+<div class="post-scripts pjax">
+    
+</div>
+
+
+    <script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/libs/pjax.min.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.pjax = new Pjax({
+            selectors: [
+                'head title',
+                '.page-container',
+                '.pjax'
+            ],
+            history: true,
+            debug: false,
+            cacheBust: false,
+            timeout: 0,
+            analytics: false,
+            currentUrlFullReload: false,
+            scrollRestoration: false,
+            // scrollTo: true,
+        });
+        
+
+        document.addEventListener('pjax:send', () => {
+            KEEP.utils.pjaxProgressBarStart();
+        });
+
+        document.addEventListener('pjax:complete', () => {
+            KEEP.utils.pjaxProgressBarEnd();
+            window.pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'));
+            KEEP.refresh();
+            var typed = new Typed('.description:not(.ellipsis)', {
+        strings: [
+            '  ',
+            "春风十里，与你相遇&nbsp;",
+        ],
+        cursorChar: "|",
+        typeSpeed: 70,
+        loop: false,
+        });
+        });
+    });
+</script>
+
+
+
+</body>
+</html>
