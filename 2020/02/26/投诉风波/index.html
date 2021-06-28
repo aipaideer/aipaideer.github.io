@@ -21,10 +21,43 @@
     <script id="hexo-configurations">
     let KEEP = window.KEEP || {};
     KEEP.hexo_config = {"hostname":"jimmyqin.com","root":"/","language":"zh-CN"};
-    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/favicon.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":true,"scale":true},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"春风十里，与你相遇"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"3.4.3"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/favicon.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":true,"scale":true},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"春风十里，与你相遇"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":true,"style":"default"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"3.4.3"};
     KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
   </script>
-  
+
+    <style>
+        body
+        {
+        cursor: url(https://cdn.jsdelivr.net/gh/aipaideer/pic/cur/default.cur),
+            default;
+    }
+    a,
+    .menu-item,
+    .active,
+    .home-article-item,
+    .s-icon-item
+        {
+        cursor: url(https://cdn.jsdelivr.net/gh/aipaideer/pic/cur/point.cur),
+            default;
+    }
+    </style>
+    <style>
+    @font-face{
+         font-family: 'jinling';
+         src: url('https://cdn.jsdelivr.net/gh/aipaideer/pic/font/jl.min.ttf') format('truetype');
+         font-display: swap;
+    }
+    @font-face {
+      font-family: 'Leckerli One';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Leckerli One'), local('LeckerliOne-Regular'), url('https://cdn.jsdelivr.net/gh/aipaideer/pic/font/Leckerli.woff2') format('woff2');
+      font-display: swap;
+    }
+    .menu-item,.home-article-title,.description:not(.ellipsis){font-family: "jinling";}
+    .logo-title{font-family: "Leckerli One";}
+    </style>
+
 <meta name="generator" content="Hexo 5.4.0"></head>
 
 
@@ -175,7 +208,7 @@
                     <div class="author">
                         <span class="name">JimmyQin</span>
                         
-                            <span class="author-label">前端小白</span>
+                            <span class="author-label">博主</span>
                         
                     </div>
                     <div class="meta-info">
@@ -516,7 +549,7 @@
         loop: false,
         });
     </script>
-
+    
 </footer>
 
         </div>
@@ -601,6 +634,8 @@
 
 
 
+
+    <script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.4.3/source/js/code-copy.js"></script>
 
 
 
